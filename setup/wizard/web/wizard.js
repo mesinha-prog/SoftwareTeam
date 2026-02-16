@@ -89,6 +89,16 @@ async function initScreen(index) {
     case 4: await initToken(); break;
     case 5: await initForkClone(); break;
     case 7: await initToolSelect(); break;
+    case 9: initDone(); break;
+  }
+}
+
+// Screen 9: Done
+function initDone() {
+  // Show GitHub Actions enablement note only for GitHub mode
+  const actionsNote = document.getElementById('done-github-actions');
+  if (actionsNote) {
+    actionsNote.style.display = state.workflowMode === 'github' ? '' : 'none';
   }
 }
 
@@ -222,11 +232,12 @@ async function githubLogin() {
 async function initToken() {
   const status = await api('/api/github/auth-status');
   if (status.authenticated) {
-    // Already signed in via browser — token is optional
+    // Already signed in via browser — gh CLI auth is sufficient for PR creation
     showAlert('token-alerts', `
       <div>
         You're already signed in as <strong>${status.username || 'GitHub user'}</strong> via browser login.
-        A token is <strong>optional</strong> — you can skip this step or add one for extra automation.
+        <strong>AI agents can create Pull Requests</strong> using this login.<br><br>
+        A token adds extra automation (e.g. environment variable for scripts). You can skip this step or add one now.
       </div>`, 'success');
     document.getElementById('token-next').disabled = false;
   }
@@ -303,7 +314,7 @@ async function forkAndClone() {
 
   if (result.success) {
     state.projectPath = result.project_path;
-    showAlert('clone-alerts', result.message, 'success');
+    showAlert('clone-alerts', `${result.message}<br><small style="color:var(--text-muted)">Repository context configured for PR creation.</small>`, 'success');
     document.getElementById('clone-next').disabled = false;
   } else {
     showAlert('clone-alerts', result.message, 'danger');

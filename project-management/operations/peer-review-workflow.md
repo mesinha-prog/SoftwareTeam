@@ -116,17 +116,26 @@ Examples:
 
 ### Workflow Triggers
 
-The peer review workflow triggers on:
-- Pull request **opened**
-- Pull request **reopened**
-- Pull request marked **ready for review** (from draft)
+Both peer review workflows use **manual trigger only** (`workflow_dispatch`) to save LLM API costs. They do NOT run automatically when a PR is created.
 
-Target branches: `master`, `main`
+**To trigger the review workflows:**
+
+1. Go to the **Actions** tab in your GitHub repository
+2. In the left sidebar, select the workflow you want to run:
+   - **"PR Review Assignment (Manual)"** — adds labels and posts review checklist comment
+   - **"Automated Multi-Agent Peer Review"** — runs LLM-powered code reviews
+3. Click the **"Run workflow"** button (top right)
+4. Enter the **PR number** in the input field
+5. Click the green **"Run workflow"** button to start
+
+**Recommended order**: Run "PR Review Assignment" first (adds labels/checklist), then "Automated Multi-Agent Peer Review" (runs the actual reviews).
 
 ### Workflow Steps
 
 ```
-PR Created/Reopened
+User clicks "Run workflow" in Actions tab
+    ↓
+Enter PR Number
     ↓
 Detect Agent Type (from branch name)
     ↓
@@ -136,11 +145,11 @@ Add Labels (peer-review:{agent}, awaiting-{agent}-review)
     ↓
 Create Review Request Comment (with checklist)
     ↓
-Notify Reviewers (via GitHub)
+Run LLM-powered reviews (sequential)
     ↓
-Wait for Reviews
+Check Approval Count
     ↓
-All Reviews Approved?
+2+ Approvals? → Mark as "peer-review:approved" + "ready-for-user-review"
     ↓
 Ready for User Review & Merge
 ```
@@ -171,10 +180,10 @@ For each PR, the workflow:
 1. **Complete Work** in your dedicated git worktree
 2. **Commit Changes** with clear, descriptive messages
 3. **Push to Remote**: `git push -u origin agent/{agent}-{project}-{sessionID}`
-4. **Create Pull Request** to `master` branch
-5. **Automated Assignment**: Workflow automatically assigns reviewers
+4. **Create Pull Request** to task master branch
+5. **Guide the user to trigger the review**: Tell them to go to the **Actions** tab, click **"Automated Multi-Agent Peer Review"**, click **"Run workflow"**, enter the PR number, and click the green button
 6. **Address Feedback**: Respond to review comments, make requested changes
-7. **Request Re-review**: After addressing feedback, request re-review
+7. **Request Re-review**: After addressing feedback, ask user to re-trigger the workflow
 8. **Await All Approvals**: Wait for all required reviewers to approve
 9. **User Review**: Only after peer approvals, user reviews and merges
 
@@ -391,20 +400,22 @@ Labels should be created in the GitHub repository:
 
 ## 8. Troubleshooting
 
-### Workflow Didn't Trigger
+### Reviews Not Appearing After PR Creation
 
-**Symptom**: PR created but no automated review assignment
+**Symptom**: PR created but no automated review comments appear
 
-**Possible Causes**:
-1. Branch name doesn't match pattern `agent/{agent}-{project}-{sessionID}`
-2. PR targets a branch other than `master` or `main`
-3. GitHub Actions are disabled
+**Most Likely Cause**: The review workflows are **manual trigger only** — they do NOT run automatically when a PR is created.
 
 **Solution**:
-- Check branch name matches the pattern
-- Ensure PR targets `master` or `main`
-- Verify GitHub Actions are enabled in repository settings
-- Manually trigger workflow: Go to Actions → Select workflow → Run workflow
+1. Go to the **Actions** tab in your GitHub repository
+2. Click **"Automated Multi-Agent Peer Review"** in the left sidebar
+3. Click **"Run workflow"**, enter the PR number, and click the green button
+4. Wait 1-3 minutes for reviews to appear as PR comments
+
+**Other Possible Causes**:
+1. Branch name doesn't match pattern `{llm-agent}/{agent}-{project}-{sessionID}`
+2. GitHub Actions are disabled in repository settings
+3. `LLM_API_KEY` repository secret is not configured
 
 ### Reviewers Not Assigned
 
@@ -464,12 +475,14 @@ Labels should be created in the GitHub repository:
    - Base: `master`
    - Head: `agent/developer-rtdcs-pbCFa`
 
-4. **Workflow triggers automatically**:
-   - Detects agent type: `developer`
-   - Applies labels: `peer-review:developer`, `awaiting-product-owner-review`, `awaiting-architect-review`, `awaiting-tester-review`
-   - Creates comment with review request and checklist
+4. **User triggers the review workflow** from the Actions tab:
+   - Goes to Actions > "Automated Multi-Agent Peer Review" > "Run workflow"
+   - Enters PR number and clicks the green button
+   - Workflow detects agent type: `developer`
+   - Applies labels: `peer-review:developer`, `awaiting-architect-review`, `awaiting-tester-review`
+   - Runs LLM-powered reviews sequentially
 
-5. **Reviewers are notified** (Product Owner, Architect, Tester)
+5. **Review comments posted on PR** (Architect, Tester)
 
 6. **Architect reviews first**:
    - Checks design adherence to `rtdcs-modulea-eds.md`

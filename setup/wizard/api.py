@@ -337,6 +337,10 @@ def api_github_fork_clone(body):
         # Add upstream for pulling template updates
         run(f'git -C "{dest}" remote add upstream https://github.com/{REPO_OWNER}/{REPO_NAME}.git', timeout=10)
 
+    # Set gh repo default so agents can create PRs without --repo flag
+    repo_owner = gh_user if gh_user else REPO_OWNER
+    run(f'gh repo set-default {repo_owner}/{REPO_NAME}', timeout=15, cwd=dest)
+
     # Write workflow-config.json for github mode
     config = {"mode": "github", "setup_complete": True}
     config_path = os.path.join(dest, "workflow-config.json")

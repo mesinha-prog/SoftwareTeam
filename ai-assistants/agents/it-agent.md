@@ -257,6 +257,27 @@ if command -v gh &> /dev/null; then
     echo "✅ gh: authenticated"
   fi
 fi
+
+# --- Verify gh repo default (CRITICAL for PR creation) ---
+if command -v gh &> /dev/null && gh auth status &> /dev/null; then
+  # Check if a default repo is set
+  REPO_DEFAULT=$(gh repo set-default --view 2>/dev/null || echo "")
+  if [ -z "$REPO_DEFAULT" ]; then
+    echo "⚠️  gh: no default repository set."
+    # Auto-detect from git remote origin
+    ORIGIN_URL=$(git remote get-url origin 2>/dev/null || echo "")
+    if [ -n "$ORIGIN_URL" ]; then
+      # Extract owner/repo from URL (handles both HTTPS and SSH)
+      REPO_SLUG=$(echo "$ORIGIN_URL" | sed -E 's#.*[:/]([^/]+/[^/.]+)(\.git)?$#\1#')
+      echo "Setting default repo to: $REPO_SLUG"
+      gh repo set-default "$REPO_SLUG"
+    else
+      echo "Run: gh repo set-default OWNER/REPO"
+    fi
+  else
+    echo "✅ gh: default repo = $REPO_DEFAULT"
+  fi
+fi
 ```
 
 #### Language Runtime & Tool Installation

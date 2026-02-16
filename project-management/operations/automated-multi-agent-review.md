@@ -52,15 +52,20 @@ The **Automated Multi-Agent Peer Review System** uses LLM APIs (OpenAI, Anthropi
 
 ### Workflow Triggers
 
-The automated review workflow triggers on:
-- **Pull request opened**: New PR created from `agent/{agent}-*` branch
-- **Pull request synchronize**: New commits pushed to existing PR
-- **Pull request reopened**: Previously closed PR is reopened
+The automated review workflow uses **manual trigger only** (`workflow_dispatch`) to save LLM API costs. It does NOT run automatically when a PR is created or updated.
+
+**To trigger the review:**
+1. Go to the **Actions** tab in your GitHub repository
+2. Click **"Automated Multi-Agent Peer Review"** in the left sidebar
+3. Click the **"Run workflow"** button (top right)
+4. Enter the **PR number** in the input field
+5. Click the green **"Run workflow"** button to start
+6. Wait 1-3 minutes for reviews to appear as PR comments
 
 ### Sequential Review Process
 
 ```
-PR Created/Updated
+User triggers "Run workflow" from Actions tab (enters PR number)
     ↓
 Extract Agent Type (from branch name)
     ↓
@@ -104,10 +109,10 @@ Based on PR branch name `agent/{agent}-{project}-{sessionID}`:
 
 ## 3. Review Flow
 
-### Phase 1: Initial Review (PR Opened)
+### Phase 1: Initial Review (After PR Created)
 
 1. **Developer** creates PR from `agent/developer-rtdcs-pbCFa`
-2. **Workflow triggers** automatically
+2. **User triggers** the review workflow from the Actions tab (enter PR number)
 3. **Product Owner Agent** reviews:
    - Fetches PR diff and files
    - Calls LLM API with Product Owner prompt and checklist
@@ -129,7 +134,7 @@ Based on PR branch name `agent/{agent}-{project}-{sessionID}`:
 ### Phase 2: Iteration (After Changes)
 
 1. **Developer** addresses feedback and pushes new commits
-2. **Workflow re-triggers** on PR synchronize
+2. **User re-triggers** the review workflow from the Actions tab (same PR number)
 3. **All reviewers re-review** the updated code (sequential again)
 4. **Approval re-check**: Count fresh approvals
 5. **Repeat** until PR is approved or closed
@@ -319,7 +324,7 @@ if (approvals >= 2 && changesRequested === 0) {
 - Commits: `git commit -m "Fix: Apply SOLID principles and improve naming"`
 - Pushes: `git push`
 
-**Round 2** (auto-triggered on push):
+**Round 2** (user re-triggers workflow from Actions tab):
 1. Product Owner: ✅ APPROVED (naming fixed)
 2. Architect: ✅ APPROVED (SOLID principles now correct)
 3. Tester: ✅ APPROVED (tests still good)
@@ -420,21 +425,22 @@ After 2+ approvals:
 
 ## 9. Troubleshooting
 
-### Issue: Workflow Doesn't Trigger
+### Issue: No Reviews After PR Creation
 
 **Symptoms**: PR created but no automated reviews appear
 
-**Possible Causes**:
-1. Branch name doesn't match pattern `agent/{agent}-{project}-{sessionID}`
-2. PR targets branch other than `master` or `main`
-3. GitHub Actions disabled
-4. ANTHROPIC_API_KEY not configured
+**Most Likely Cause**: The workflow is **manual trigger only** — it does NOT run automatically.
 
-**Solutions**:
-- Check branch name pattern
-- Verify PR targets `master`
-- Check Actions tab for workflow runs
-- Verify ANTHROPIC_API_KEY secret exists
+**Solution**:
+1. Go to the **Actions** tab in your GitHub repository
+2. Click **"Automated Multi-Agent Peer Review"** in the left sidebar
+3. Click **"Run workflow"**, enter the PR number, and click the green button
+4. Wait 1-3 minutes for reviews to appear
+
+**Other Possible Causes**:
+1. Branch name doesn't match pattern `{llm-agent}/{agent}-{project}-{sessionID}`
+2. GitHub Actions disabled in repository settings
+3. `LLM_API_KEY` secret not configured
 
 ### Issue: API Key Error
 
@@ -560,14 +566,16 @@ Models vary by provider:
     └── package.json                 # Dependencies
 ```
 
-### Execution Flow
+### Execution Flow (Both Manually Triggered)
 
-1. **pr-review-assignment.yml** runs first:
+1. **pr-review-assignment.yml** (optional, run first):
+   - Trigger: Actions tab > "PR Review Assignment (Manual)" > Run workflow > Enter PR number
    - Adds labels
    - Posts checklist comment for reference
 
-2. **automated-peer-review.yml** runs next:
-   - Calls Claude API for each reviewer
+2. **automated-peer-review.yml** (main review workflow):
+   - Trigger: Actions tab > "Automated Multi-Agent Peer Review" > Run workflow > Enter PR number
+   - Calls LLM API for each reviewer
    - Posts review comments
    - Tracks approvals
    - Marks PR when approved

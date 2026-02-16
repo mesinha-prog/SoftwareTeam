@@ -441,7 +441,14 @@ When an agent finishes their work and is ready to hand over to the next agent:
    >
    > Creating a PR allows you to review my work before proceeding."
 6. **Wait for user response** - Do NOT assume the answer
-7. **If user wants PR**: Create PR using the [PR Creation Process](#pr-creation-process) below, then WAIT for user approval before proceeding
+7. **If user wants PR**: Create PR using the [PR Creation Process](#pr-creation-process) below, then:
+   - **Tell the user how to trigger the peer review workflow** (see [How to Trigger Peer Review](#how-to-trigger-peer-review-manual--step-by-step)):
+     > "PR created! To run the automated peer review:
+     > 1. Go to the **Actions** tab in your repo
+     > 2. Click **'Automated Multi-Agent Peer Review'** in the sidebar
+     > 3. Click **'Run workflow'**, enter PR number **#[NUMBER]**, and click the green button
+     > 4. Reviews will appear as comments on the PR in 1-3 minutes"
+   - WAIT for user approval before proceeding
 8. **If user says continue**: Proceed to the next agent role, noting that work is committed on the branch
 
 **When the NEXT agent starts, it MUST** (see [Task Analysis & Collaboration Protocol](#task-analysis--collaboration-protocol)):
@@ -542,9 +549,31 @@ gh pr create \
 gh pr list --head $(git branch --show-current)
 ```
 
-**If PR creation fails**: Show the error to the user and ask for help resolving it (e.g., missing GITHUB_TOKEN, authentication issues). Note: `gh` CLI should already be installed by IT Agent in Step 0.
+**If PR creation fails**:
+1. First try `gh auth status` to check authentication. If not logged in, run `gh auth login` to authenticate.
+2. If `gh` can't determine which repository to target, run `gh repo set-default OWNER/REPO` (use the fork owner's username and repo name).
+3. If authentication is fine but PR still fails, check the error message and fix the issue (e.g., branch not pushed, remote not set).
+4. **You MUST create the PR yourself. NEVER ask the user to create a PR manually.** Keep troubleshooting until it succeeds.
 
-**REQUIREMENT**: Ensure `GITHUB_TOKEN` environment variable or `gh auth login` is configured before creating PRs.
+**PR Creation Troubleshooting Checklist** (run these if `gh pr create` fails):
+```bash
+# 1. Check authentication
+gh auth status
+
+# 2. Check/set repository context (CRITICAL — most common failure)
+gh repo set-default    # shows current default
+# If not set or wrong, set it:
+gh repo set-default OWNER/REPO   # e.g., gh repo set-default myuser/BigProjPOC
+
+# 3. Verify remote is correct
+git remote -v
+# origin should point to your fork (not the template repo)
+
+# 4. Ensure branch is pushed
+git push -u origin $(git branch --show-current)
+```
+
+**REQUIREMENT**: Either `GITHUB_TOKEN` environment variable or `gh auth login` must be configured. The `gh` CLI supports both methods — browser login via `gh auth login` is sufficient for PR creation.
 
 ### ⚠️ PR Checklist for ALL Agents
 
@@ -583,6 +612,28 @@ Each reviewer checks:
 2. **Phase 2 - User Review**: After peer approval, user reviews and merges
 
 **NEVER skip peer review** - Quality before speed
+
+#### How to Trigger Peer Review (Manual — Step by Step)
+
+The peer review workflows are **manual trigger only** (`workflow_dispatch`) to save LLM API costs. They do NOT run automatically when a PR is created. After an agent creates a PR, **guide the user through these steps**:
+
+1. Go to the **Actions** tab in your GitHub repository
+2. In the left sidebar, click **"Automated Multi-Agent Peer Review"**
+3. Click the **"Run workflow"** button (top right, blue button)
+4. Enter the **PR number** (e.g., `5`) in the input field
+5. Click the green **"Run workflow"** button to start
+6. Wait for the workflow to complete (usually 1-3 minutes)
+7. Check the PR's **Conversation** tab for review summary comments
+8. Check the PR's **Files changed** tab for inline code comments
+
+**Optionally**, you can also trigger the **"PR Review Assignment (Manual)"** workflow first to add labels and a review checklist comment before the automated review.
+
+**Prerequisites** (one-time setup):
+- `LLM_API_KEY` repository secret must be configured (Settings > Secrets and variables > Actions)
+- `LLM_PROVIDER` secret should be set (defaults to `openai` if not set)
+- GitHub Actions must have **Read and write permissions** (Settings > Actions > General > Workflow permissions)
+
+**IMPORTANT for agents**: After creating a PR, you MUST inform the user about these manual steps. Do NOT tell the user that reviews will happen automatically — they must manually trigger the workflow from the Actions tab.
 
 ---
 

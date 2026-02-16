@@ -55,6 +55,8 @@ For ANY user task, follow the steps defined in `AI-WORKFLOW.md`. Summary:
 
 **NEVER skip this step. This is the #1 failure mode observed during testing.**
 
+**NEVER ask the user to create a PR manually.** You MUST create it yourself using `gh pr create`. If it fails, troubleshoot in this order: (1) `gh auth status` — fix auth, (2) `gh repo set-default OWNER/REPO` — set repo context, (3) `git remote -v` — verify remotes. Do NOT give up and ask the user to do it.
+
 ### PR Creation (when user requests it)
 
 ```bash
@@ -62,6 +64,10 @@ For ANY user task, follow the steps defined in `AI-WORKFLOW.md`. Summary:
 git add -A
 git commit -m "[Agent Name] Description of completed work"
 git push -u origin copilot/{agent}-{task_name}-{sessionID}
+
+# Ensure repo context is set (CRITICAL — prevents "could not determine repo" errors)
+gh repo set-default $(git remote get-url origin | sed -E 's#.*[:/]([^/]+/[^/.]+)(\.git)?$#\1#')
+
 gh pr create \
   --base master_{task_name} \
   --head copilot/{agent}-{task_name}-{sessionID} \
@@ -75,6 +81,14 @@ gh pr create \
 
 ## Ready for
 [Next Agent Name]"
+```
+
+**If PR creation fails**, run these troubleshooting steps:
+```bash
+gh auth status                    # 1. Check authentication
+gh repo set-default OWNER/REPO   # 2. Set repository context
+git remote -v                     # 3. Verify remotes point to your fork
+git push -u origin $(git branch --show-current)  # 4. Ensure branch is pushed
 ```
 
 ---

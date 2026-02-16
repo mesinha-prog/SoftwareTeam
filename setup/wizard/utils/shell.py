@@ -5,13 +5,14 @@ import shutil
 import os
 
 
-def run(cmd, capture=True, timeout=120):
+def run(cmd, capture=True, timeout=120, cwd=None):
     """Run a shell command and return result dict.
 
     Args:
         cmd: Command string or list.
         capture: If True, capture stdout/stderr.
         timeout: Timeout in seconds.
+        cwd: Working directory for the command.
 
     Returns:
         dict with keys: success, stdout, stderr, returncode
@@ -24,6 +25,7 @@ def run(cmd, capture=True, timeout=120):
             text=True,
             timeout=timeout,
             env=_get_env(),
+            cwd=cwd,
         )
         return {
             "success": result.returncode == 0,

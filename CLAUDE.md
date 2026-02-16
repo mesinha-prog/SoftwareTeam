@@ -37,6 +37,8 @@ When a user gives you ANY task (feature, bug fix, question, etc.), follow the st
 
 **NEVER skip this step. This is the #1 failure mode observed during testing.**
 
+**NEVER ask the user to create a PR manually.** You MUST create it yourself using `gh pr create`. If it fails, troubleshoot in this order: (1) `gh auth status` — fix auth, (2) `gh repo set-default OWNER/REPO` — set repo context, (3) `git remote -v` — verify remotes. Do NOT give up and ask the user to do it.
+
 See `AI-WORKFLOW.md` for the full Handover Protocol, PR Creation Process, and Common Agent Protocols.
 
 ## Git Workflow (ALWAYS FOLLOW)
