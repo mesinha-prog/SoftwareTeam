@@ -170,11 +170,20 @@ Once you're set up, the AI follows a structured workflow:
 ```
 You describe what you want
          ↓
+      IT Agent
+   (Verifies git and gh CLI are set up)
+         ↓
    Product Owner
    (Understands your request, creates plan)
          ↓
+   Cost Analyst
+   (Estimates cost, warns if expensive)
+         ↓
       Architect
    (Designs the solution)
+         ↓
+      IT Agent
+   (Installs project dependencies)
          ↓
       Developer
    (Writes the code)
@@ -182,15 +191,19 @@ You describe what you want
        Tester
    (Validates it works)
          ↓
+      IT Agent
+   (Builds release artifacts)
+         ↓
    Product Owner
    (Reviews and presents to you)
 ```
 
 **Important**: The AI will automatically:
-1. Start as **Product Owner** to understand your request
-2. Update project documentation with your domain info
-3. Follow the complete workflow for quality results
-4. **Automatically create Pull Requests** using your GitHub token
+1. Start as **IT Agent** to verify tools are installed
+2. Then **Product Owner** to understand your request
+3. **Cost Analyst** estimates cost before proceeding
+4. Follow the complete workflow for quality results
+5. **Automatically create Pull Requests** using your GitHub token
 
 ### Branching Strategy
 

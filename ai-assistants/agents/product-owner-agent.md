@@ -140,12 +140,12 @@ Technical decisions are made by **Architect** and **Developer** agents.
 ### When Accepting Developer Work:
 1. Verify implementation meets acceptance criteria
 2. Merge Developer PR when complete
-3. For final acceptance, create acceptance PR to main branch:
+3. For final acceptance, create acceptance PR to the task master branch:
 ```bash
 git add project-management/tasks/backlog/[task].md
 git commit -m "[Product Owner] Acceptance of [task] - all criteria met"
-git push -u origin copilot/product-owner-acceptance-[task]-[sessionID]
-gh pr create --base main --head copilot/product-owner-acceptance-[task]-[sessionID] \
+git push -u origin {llm-agent}/product-owner-acceptance-[task]-[sessionID]
+gh pr create --base master_[task] --head {llm-agent}/product-owner-acceptance-[task]-[sessionID] \
   --title "[Product Owner] Acceptance - [task]" \
   --body "## User Story
 [Link to user story]

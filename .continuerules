@@ -23,21 +23,37 @@ For ANY user task, follow the steps defined in `AI-WORKFLOW.md`. Summary:
 
 ## MANDATORY HANDOVER PROTOCOL (CRITICAL - DO NOT SKIP)
 
-**At EVERY handover between agents, you MUST:**
+**When you finish your work as an agent, follow the handover rules for your current role.**
 
-1. **STOP** - Do not silently continue to the next agent
-2. **Commit and push** all work to the branch
-3. **Ask the user**:
-   > "My work as [Agent Name] is complete. Before handing over to [Next Agent]:
-   > - Would you like me to **create a PR** for review?
-   > - Or should I **continue directly** to [Next Agent]?"
-4. **Wait for user response** - Do NOT assume the answer
-5. **If user wants PR**: Create it using `gh pr create`, then wait for approval
-6. **If user says continue**: Proceed to next agent
+**Creating a PR when the user requests one:**
+Create it yourself using gh pr create. Never ask the user to create it manually. If it fails, troubleshoot in this order: check gh auth status, then run gh repo set-default OWNER/REPO, then verify git remote -v.
 
-**NEVER skip this step. This is the #1 failure mode observed during testing.**
+**IT Agent after verifying git and gh tools:**
+Continue directly to Product Owner. No need to ask the user.
 
-**NEVER ask the user to create a PR manually.** You MUST create it yourself using `gh pr create`. If it fails, troubleshoot in this order: (1) `gh auth status` — fix auth, (2) `gh repo set-default OWNER/REPO` — set repo context, (3) `git remote -v` — verify remotes. Do NOT give up and ask the user to do it.
+**Product Owner after creating the user story:**
+Continue directly to Cost Analyst. No need to ask the user.
+
+**Cost Analyst after completing the cost estimate:**
+Report the cost estimate to the user. If the user approves, continue directly to Architect.
+
+**Architect after completing the design:**
+Stop. Commit and push your work. Ask the user: "Would you like me to create a PR for review, or continue directly to IT Agent for project setup?" Wait for the user's response before proceeding.
+
+**IT Agent after setting up the project:**
+Stop. Commit and push your work. Ask the user: "Would you like me to create a PR for review, or continue directly to Developer?" Wait for the user's response before proceeding.
+
+**Developer after completing the implementation:**
+Stop. Commit and push your work. Provide the one-line command to run the app. Ask the user: "Would you like me to create a PR for review, or continue directly to Tester?" Wait for the user's response before proceeding.
+
+**Tester after completing validation:**
+Stop. Commit and push your work. Provide the one-line command to run the tests. Ask the user: "Would you like me to create a PR for review, or continue directly to IT Agent for release?" Wait for the user's response before proceeding.
+
+**IT Agent after building the release:**
+Stop. Commit and push your work. Ask the user: "Would you like me to create a PR for review, or continue directly to Product Owner for acceptance?" Wait for the user's response before proceeding.
+
+**Product Owner for acceptance:**
+Present the completed work to the user with the run and test commands. Ask the user to review and accept.
 
 ## GIT WORKFLOW
 

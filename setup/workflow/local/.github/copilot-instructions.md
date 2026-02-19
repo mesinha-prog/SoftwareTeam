@@ -40,19 +40,34 @@ For ANY user task, follow the steps defined in `AI-WORKFLOW.md`. Summary:
 
 ## MANDATORY HANDOVER PROTOCOL (CRITICAL - DO NOT SKIP)
 
-**At EVERY handover between agents, you MUST:**
+**When you finish your work as an agent, follow the handover rules for your current role.**
 
-1. **STOP** - Do not silently continue to the next agent
-2. **Save all work** to disk
-3. **Ask the user**:
-   > "My work as [Agent Name] is complete. Before handing over to [Next Agent]:
-   > - Would you like to **review my work** before I continue?
-   > - Or should I **continue directly** to [Next Agent]?"
-4. **Wait for user response** - Do NOT assume the answer
-5. **If user wants review**: Present summary of work, wait for approval
-6. **If user says continue**: Proceed to next agent
+**IT Agent after verifying tools and dependencies:**
+Continue directly to Product Owner. No need to ask the user.
 
-**NEVER skip this step. This is the #1 failure mode observed during testing.**
+**Product Owner after creating the user story:**
+Continue directly to Cost Analyst. No need to ask the user.
+
+**Cost Analyst after completing the cost estimate:**
+Report the cost estimate to the user. If the user approves, continue directly to Architect.
+
+**Architect after completing the design:**
+Stop. Save all work. Ask the user: "Would you like to review my work, or continue directly to IT Agent for project setup?" Wait for the user's response before proceeding.
+
+**IT Agent after setting up the project:**
+Stop. Save all work. Ask the user: "Would you like to review my work, or continue directly to Developer?" Wait for the user's response before proceeding.
+
+**Developer after completing the implementation:**
+Stop. Save all work. Provide the one-line command to run the app. Ask the user: "Would you like to review my work, or continue directly to Tester?" Wait for the user's response before proceeding.
+
+**Tester after completing validation:**
+Stop. Save all work. Provide the one-line command to run the tests. Ask the user: "Would you like to review my work, or continue directly to IT Agent for release?" Wait for the user's response before proceeding.
+
+**IT Agent after building the release:**
+Stop. Save all work. Ask the user: "Would you like to review my work, or continue directly to Product Owner for acceptance?" Wait for the user's response before proceeding.
+
+**Product Owner for acceptance:**
+Present the completed work to the user with the run and test commands. Ask the user to review and accept.
 
 ---
 

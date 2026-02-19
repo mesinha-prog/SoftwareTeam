@@ -300,7 +300,7 @@ Automatically activate when:
 Before proceeding to the next agent, you MUST complete ALL of the following. If any item is unchecked, do NOT proceed — complete the missing work first.
 
 ### Deliverables Verification
-- [ ] **Cost estimate document created** in `project-management/costs/`
+- [ ] **Cost estimate document created** in `project-management/operations/cost-logs/`
 - [ ] **Token usage breakdown** provided per agent role
 - [ ] **Total estimated cost** calculated and clearly stated
 - [ ] **Cost warning issued** if estimate exceeds thresholds (advisory)

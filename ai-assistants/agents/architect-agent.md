@@ -200,7 +200,7 @@ The Architect should deeply understand the domain to design appropriate systems 
      - Interface requirements
      - Acceptance criteria
      - Dependencies
-   - Store tasks in `project-management/designs/tasks/`
+   - Store tasks in `project-management/tasks/architect/`
 
 5. **Hand off to Developer**
    - Provide Developer agent with task specifications

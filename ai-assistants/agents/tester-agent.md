@@ -69,11 +69,11 @@ git add project-management/quality/plans/*.md
 git commit -m "[Tester] Test validation and quality report"
 
 # 2. Push to branch
-git push -u origin copilot/tester-[task]-[sessionID]
+git push -u origin {llm-agent}/tester-[task]-[sessionID]
 
 # 3. Create PR to task master branch
 gh pr create --base master_[task_name] \
-  --head copilot/tester-[task]-[sessionID] \
+  --head {llm-agent}/tester-[task]-[sessionID] \
   --title "[Tester] Quality Validation & Test Report" \
   --body "## Summary
 Comprehensive testing and validation of implementation
@@ -99,7 +99,7 @@ Comprehensive testing and validation of implementation
 - [x] Acceptance criterion 3 ✅
 
 ## Ready for
-Product Owner (Acceptance)"
+IT Agent (Release)"
 
 # 4. Verify PR exists on GitHub
 # Do NOT proceed until PR URL is confirmed
@@ -484,14 +484,14 @@ When creating a PR for testing work, include in the PR body:
 - Test coverage percentages
 - Bugs found and their status
 - Validation against acceptance criteria
-- The "Ready for" field should indicate "Product Owner (Acceptance)"
+- The "Ready for" field should indicate "IT Agent (Release)"
 
 ## BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)
 
-Before proceeding to Product Owner (Acceptance), you MUST complete ALL of the following. If any item is unchecked, do NOT proceed — complete the missing work first.
+Before proceeding to IT Agent (Release), you MUST complete ALL of the following. If any item is unchecked, do NOT proceed — complete the missing work first.
 
 ### Deliverables Verification
-- [ ] **Test plan created** in `modules/[module-name]/test/`
+- [ ] **Test plan created** in `project-management/quality/plans/`
 - [ ] **All test cases executed** and results documented
 - [ ] **Test report created** with pass/fail counts and coverage percentages
 - [ ] **Bug reports filed** for any failures (with severity and reproduction steps)
@@ -513,7 +513,7 @@ Before proceeding to Product Owner (Acceptance), you MUST complete ALL of the fo
   - **Mac/Linux**: `bash scripts/test.sh` (or the project-specific command, e.g., `npm test`, `pytest`)
   - **Windows**: `scripts\test.ps1` or the project-specific command (e.g., `npm test`, `pytest`)
   - **Keep it to ONE command.** The user should be able to copy-paste and see all tests run.
-- [ ] **Ask user**: "My work as Tester is complete. Would you like me to create a PR for review, or continue directly to Product Owner for acceptance?"
+- [ ] **Ask user**: "My work as Tester is complete. Would you like me to create a PR for review, or continue directly to IT Agent for release?"
 - [ ] **Wait for user response** — do NOT assume the answer
 - [ ] If PR requested: create it using `gh pr create` targeting the task master branch
 

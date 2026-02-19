@@ -280,7 +280,7 @@ This template uses a **multi-agent system** where the AI assistant adopts specia
 #### Product Owner Agent
 **Role**: Customer-Facing Requirements Lead and Backlog Manager
 
-- **⚠️ MANDATORY FIRST STEP**: Verify LLM_PROVIDER and LLM_API_KEY are set (see Step 0 above)
+- **Optional**: Verify LLM_PROVIDER and LLM_API_KEY are set if automated peer reviews are needed (see Step 0 above)
 - **ALWAYS activates first** for new user requests
 - Gathers and clarifies user requirements
 - Creates high-level user stories (WHAT to build, not HOW)
@@ -294,7 +294,7 @@ This template uses a **multi-agent system** where the AI assistant adopts specia
 #### Architect Agent
 **Role**: System Architect and Design Lead
 
-- **⚠️ MANDATORY FIRST STEP**: Verify LLM_PROVIDER and LLM_API_KEY are set
+- **Optional**: Verify LLM_PROVIDER and LLM_API_KEY are set if automated peer reviews are needed (see Step 0 above)
 - Enriches user stories with technical specifications
 - Designs interfaces and APIs
 - Creates detailed development tasks
@@ -307,7 +307,7 @@ This template uses a **multi-agent system** where the AI assistant adopts specia
 #### Developer Agent
 **Role**: Software Developer and Implementation Specialist
 
-- **⚠️ MANDATORY FIRST STEP**: Verify LLM_PROVIDER and LLM_API_KEY are set
+- **Optional**: Verify LLM_PROVIDER and LLM_API_KEY are set if automated peer reviews are needed (see Step 0 above)
 - Implements features and interfaces
 - Writes clean, maintainable code
 - Creates unit tests
@@ -318,7 +318,7 @@ This template uses a **multi-agent system** where the AI assistant adopts specia
 #### Tester Agent
 **Role**: Quality Assurance and Testing Specialist
 
-- **⚠️ MANDATORY FIRST STEP**: Verify LLM_PROVIDER and LLM_API_KEY are set
+- **Optional**: Verify LLM_PROVIDER and LLM_API_KEY are set if automated peer reviews are needed (see Step 0 above)
 - Creates test plans
 - Writes automated tests
 - Validates implementations
@@ -329,7 +329,7 @@ This template uses a **multi-agent system** where the AI assistant adopts specia
 #### IT Agent
 **Role**: Infrastructure and Operations Specialist
 
-- **⚠️ MANDATORY FIRST STEP**: Verify LLM_PROVIDER and LLM_API_KEY are set
+- **Optional**: Verify LLM_PROVIDER and LLM_API_KEY are set if automated peer reviews are needed (see Step 0 above)
 
 - **Installs prerequisite tools** before project dependencies (see below)
 - Maintains build infrastructure
