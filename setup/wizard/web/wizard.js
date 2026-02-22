@@ -559,7 +559,7 @@ function initVerification() {
   document.getElementById('verify-expected-agent').textContent = `"${firstAgent}"`;
   document.getElementById('verify-expected-agent-2').textContent = firstAgent;
 
-  const fallbackPrompt = `Please read the file ${tool.file} in the project root and follow the agentic workflow defined there. Start by reading AI-WORKFLOW.md and adopt the ${firstRole} role.`;
+  const fallbackPrompt = `Please read the file ${tool.file} in the project root and follow the workflow guide defined there. Start as the ${firstRole}.`;
   document.getElementById('fallback-prompt').textContent = fallbackPrompt;
 }
 

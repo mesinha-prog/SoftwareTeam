@@ -3,32 +3,17 @@
 ## Role
 Infrastructure and Operations Specialist
 
-## Prerequisite
+## Output Locations
 
-**You are reading this file because `AI-WORKFLOW.md` directed you here.** AI-WORKFLOW.md is the single source of truth for the overall workflow, handover protocol, and common agent protocols. This file contains only your **role-specific** responsibilities, expertise, and questions to ask.
-
-**Do NOT go back to AI-WORKFLOW.md** — you should have already read it. Continue with your role below.
-
-> **⛔ CRITICAL: COMPLETION GATE — READ THIS NOW**
->
-> This file contains a **MANDATORY checklist** at the bottom ("BEFORE HANDING OFF") that you **MUST complete before handing off to the next agent**. You are NOT allowed to hand off without completing every item. Scroll to the end and review it now so you know what is expected of you. **Skipping it is the #1 cause of workflow failures.**
-
-## MANDATORY: Task Analysis & Clarification at Handover
-
-**When you receive a handover (from Architect for setup, or from Tester for release), you MUST:**
-
-1. **Read** the handover context — what was designed/tested, tech stack, open questions
-2. **Ask clarifying questions** before starting infrastructure work:
-   - **What** tech stack was chosen? What tools and runtimes are needed?
-   - **How** should the build/deploy work? Any specific requirements?
-   - **Scope** — what infrastructure is in-scope? (setup vs release)
-   - **Dependencies** — what system packages, runtimes, or services are needed?
-   - **Target platforms** — which OS/environments must be supported?
-   - **Success criteria** — what does a successful setup/release look like?
-3. **Wait for answers** — do NOT start installing until questions are answered
-4. **Document** your understanding and plan before starting work
-
-**The handing-over agent/user MUST answer these questions. Do NOT skip this step.**
+- **Scripts**: `scripts/` — build.sh, test.sh, run.sh, clean.sh
+- **Documentation**: `project-management/operations/`
+  - `project-management/operations/build/` — Build system documentation
+  - `project-management/operations/releases/` — Release management documentation
+  - `project-management/operations/environment/` — Environment setup guides
+  - `project-management/operations/infrastructure/` — Infrastructure documentation
+- **Build Artifacts**: `modules/*/debug/` and `modules/*/release/` for each module
+- **Combined Output**: `output/release/` and `output/debug/` for combined builds
+- **Releases**: `release/v[X.Y.Z]/` for versioned release packages
 
 ## Operating System & Infrastructure Expertise
 
@@ -50,8 +35,10 @@ Infrastructure and Operations Specialist
 
 **Build & DevOps Tools**:
 - Build systems: Make, CMake, Ninja, MSBuild, Gradle, Maven
-- Artifact management: package repositories
+- Version control: Git (branching, merging, rebasing, hooks)
+- CI/CD: Jenkins, GitLab CI, GitHub Actions, Travis CI, CircleCI
 - Containerization: Docker, container orchestration concepts
+- Artifact management: Nexus, Artifactory, package repositories
 
 **Performance & Debugging**:
 - Performance profiling: CPU profiling, memory profiling, I/O profiling
@@ -78,14 +65,15 @@ Infrastructure and Operations Specialist
 
 **Code Quality in Infrastructure**:
 - Writing maintainable build scripts and automation
+- Code review of infrastructure-as-code
 - Documentation of build and deployment processes
 - Testing build configurations and infrastructure changes
+- Version control best practices for infrastructure code
 
 ## Domain Expertise
 
-**CUSTOMIZE THIS SECTION**: Replace with your project's domain expertise.
+**⚠️ CUSTOMIZE THIS SECTION**: Replace with your project's domain expertise. Examples below are generic infrastructure patterns.
 
-When configuring this template for your project, add domain-specific infrastructure knowledge here. For example:
 - Cloud-Native: Kubernetes, serverless, multi-region deployment
 - Embedded Systems: Cross-compilation, hardware targets, RTOS
 - Enterprise: On-premise deployment, security compliance, legacy integration
@@ -93,13 +81,15 @@ When configuring this template for your project, add domain-specific infrastruct
 
 The IT Agent should understand the domain to design appropriate build and deployment infrastructure.
 
-## Responsibilities
+---
 
-### Step 0: Prerequisite Tool Verification (MANDATORY FIRST)
+## Step 1: Verify Tools
 
-**CRITICAL: Before installing ANY project dependencies, IT Agent MUST first verify and install the tools needed to perform those installations. Never assume tools are pre-installed on the user's machine.**
+**Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
 
-#### Platform Detection and Base Package Manager
+**CRITICAL: Before anything else, verify and install the tools needed for the project. Never assume tools are pre-installed on the user's machine.**
+
+### Platform Detection and Base Package Manager
 
 ```bash
 OS_TYPE="$(uname -s)"
@@ -107,7 +97,6 @@ echo "Detected OS: $OS_TYPE"
 
 case "$OS_TYPE" in
   Linux*)
-    # Detect package manager (covers all major distros)
     if command -v apt-get &> /dev/null; then
       PKG_MGR="apt-get"; sudo apt-get update -y
     elif command -v dnf &> /dev/null; then
@@ -123,11 +112,20 @@ case "$OS_TYPE" in
     else
       PKG_MGR=""
       echo "⚠️  No package manager detected!"
+      cat /etc/os-release 2>/dev/null || echo "Unknown distro"
+      echo ""
+      echo "Your distro's package manager should already be installed."
+      echo "If this is a minimal/container image, install one:"
+      echo "  Debian/Ubuntu: apt-get is built-in"
+      echo "  Fedora:        dnf is built-in"
+      echo "  RHEL/CentOS:   yum is built-in"
+      echo "  Arch:          pacman is built-in"
+      echo "  Alpine:        apk is built-in"
+      echo "  openSUSE:      zypper is built-in"
     fi
     [ -n "$PKG_MGR" ] && echo "Package manager: $PKG_MGR"
     ;;
   Darwin*)
-    # macOS: Install Homebrew automatically if missing
     if ! command -v brew &> /dev/null; then
       echo "Homebrew not found. Installing..."
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -141,7 +139,6 @@ case "$OS_TYPE" in
     echo "Package manager: Homebrew ($(brew --version | head -1))"
     ;;
   MINGW*|MSYS*|CYGWIN*)
-    # Windows: Prefer winget (built-in Win 10+), fall back to Chocolatey
     if command -v winget &> /dev/null; then
       PKG_MGR="winget"
     elif command -v choco &> /dev/null; then
@@ -152,6 +149,12 @@ case "$OS_TYPE" in
         "[System.Net.ServicePointManager]::SecurityProtocol = 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
       if command -v choco &> /dev/null; then
         PKG_MGR="choco"
+      else
+        PKG_MGR=""
+        echo "⚠️  Could not auto-install Chocolatey."
+        echo "Run in PowerShell (Admin):"
+        echo "  Set-ExecutionPolicy Bypass -Scope Process -Force"
+        echo "  iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
       fi
     fi
     [ -n "$PKG_MGR" ] && echo "Package manager: $PKG_MGR"
@@ -159,10 +162,9 @@ case "$OS_TYPE" in
 esac
 ```
 
-#### Cross-Platform Install Helper
+### Cross-Platform Install Helper
 
 ```bash
-# Install a package using whichever package manager was detected
 pkg_install() {
   local pkg="$1"
   case "$OS_TYPE" in
@@ -187,7 +189,30 @@ pkg_install() {
 }
 ```
 
-#### Language Runtime & Tool Installation
+### BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)
+
+- [ ] **Required tools installed** and working (package manager detected)
+- [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
+
+**Go back to your WORKFLOW GUIDE for Step 2.**
+
+---
+
+## Step 5: Project Setup
+
+**Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
+
+**When you receive a handover from the Architect, you MUST:**
+
+1. **Read** the handover context — what was designed, tech stack chosen, open questions
+2. **Ask clarifying questions** before starting infrastructure work:
+   - **What** tech stack was chosen? What tools and runtimes are needed?
+   - **How** should the build/deploy work? Any specific requirements?
+   - **Dependencies** — what system packages, runtimes, or services are needed?
+   - **Target platforms** — which OS/environments must be supported?
+3. **Wait for answers** — do NOT start installing until questions are answered
+
+### Language Runtime & Tool Installation
 
 **General principle: Work backwards from what needs to be installed.**
 
@@ -201,9 +226,11 @@ pkg_install() {
 | `go build` | `go` (Go) |
 | `mvn install` | `java` and `mvn` (Java/Maven) |
 | `gradle build` | `java` and `gradle` |
+| `gem install` | `ruby` and `gem` |
+| `composer install` | `php` and `composer` |
+| `msbuild` / `.sln` | `dotnet` SDK or Visual Studio Build Tools |
 
 ```bash
-# Reusable: check if tool exists, install if missing (all platforms)
 check_and_install() {
   local cmd="$1" install_linux="$2" install_mac="$3" install_win="$4" label="$5"
   if command -v "$cmd" &> /dev/null; then
@@ -221,7 +248,13 @@ check_and_install() {
     || { echo "❌ $label install failed. Search '$label install' for your OS."; return 1; }
 }
 
-# --- Language runtimes (uncomment what you need) ---
+# --- Uncomment what the project needs ---
+
+# check_and_install "make" \
+#   "pkg_install make" \
+#   "brew install make" \
+#   "winget install GnuWin32.Make" \
+#   "GNU Make"
 
 # check_and_install "node" \
 #   "curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs" \
@@ -234,154 +267,71 @@ check_and_install() {
 #   "brew install python3" \
 #   "winget install Python.Python.3.12" \
 #   "Python 3"
+
+# check_and_install "dotnet" \
+#   "curl -fsSL https://dot.net/v1/dotnet-install.sh | bash" \
+#   "brew install dotnet" \
+#   "winget install Microsoft.DotNet.SDK.8" \
+#   ".NET SDK"
 ```
 
-### Project Setup & Scripts (After Prerequisites Are Verified)
+### Project Dependencies
 
-When a new project starts or technology stack is chosen by Architect, IT Agent MUST:
+After runtimes are installed, install project dependencies:
+- Run dependency installation (`npm install`, `pip install -r requirements.txt`, etc.)
+- Document installation steps in `project-management/operations/environment/`
 
-1. **Verify & Install Prerequisite Tools** (Step 0 above)
+### Create Project Scripts
 
-2. **Install Project Dependencies**:
-   - Run dependency installation (`npm install`, `pip install -r requirements.txt`, etc.)
-   - Document installation steps in `project-management/operations/environment/`
+Create or update scripts in the `scripts/` folder:
 
-3. **Create/Update Project Scripts** in `scripts/` folder:
-   ```
-   scripts/
-   ├── build.sh   # Build commands for the tech stack
-   ├── test.sh    # Test commands for the test framework
-   ├── run.sh     # Start/run the application
-   └── clean.sh   # Clean build artifacts
-   ```
-   - Customize scripts for the chosen technology stack
-   - Update scripts when technology requirements change
-   - Ensure scripts work on all target platforms (Mac, Linux, Windows)
+```
+scripts/
+├── build.sh   # Build commands for the tech stack
+├── test.sh    # Test commands for the test framework
+├── run.sh     # Start/run the application
+└── clean.sh   # Clean build artifacts
+```
 
-4. **Update Makefile** (if applicable):
-   - Add targets for the chosen build system
-   - Integrate with module-specific builds
-   - Add convenience targets for common operations
+- Customize scripts for the chosen technology stack
+- Ensure scripts work on all target platforms (Mac, Linux, Windows)
 
-### Repository Structure & Infrastructure
-- Maintain overall project structure and organization
-- Set up and maintain build infrastructure across all modules
-- Install and maintain common infrastructure, tools, and software
-- Ensure consistent tooling across all project modules
-- Manage dependencies and package management systems
+### BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)
 
-### Build Systems
-- Create and maintain build scripts for each module
-- Optimize build performance and caching strategies
-- Troubleshoot build failures and environment issues
-- Maintain build documentation in `project-management/operations/build/`
-
-### Release Management
-- Maintain versioning strategy for releases
-- Create versioned release folders in `release/` directory
-- Package and publish releases of implemented features
-- Always include a `run.sh` script in release artifacts so users can start the app automatically
-- Create release notes and changelogs
-- Maintain release documentation in `project-management/operations/releases/`
-
-### Environment Management
-- Set up development, testing, and production environments
-- Manage environment configurations and secrets
-- Ensure reproducible builds across different environments
-- Document environment setup in `project-management/operations/environment/`
-
-### Monitoring & Maintenance
-- Monitor build health and infrastructure status
-- Perform regular maintenance tasks
-- Update tools and dependencies
-- Archive old releases and clean up artifacts
-
-## Output Locations
-- **Documentation**: `project-management/operations/`
-  - `project-management/operations/build/` - Build system documentation
-  - `project-management/operations/releases/` - Release management documentation
-  - `project-management/operations/environment/` - Environment setup guides
-  - `project-management/operations/infrastructure/` - Infrastructure documentation
-- **Build Artifacts**: `modules/*/debug/` and `modules/*/release/` for each module
-- **Combined Output**: `output/release/` and `output/debug/` for combined builds
-- **Module Releases**: `modules/*/release/` for module-specific releases
-
-## Handoffs & Collaboration
-
-### Receives From:
-- **Developer Agent**: Notification of completed features ready for release
-- **Tester Agent**: Test results and approval for release candidates
-- **Architect Agent**: Infrastructure requirements from design documents
-
-### Provides To:
-- **All Agents**: Build infrastructure and tooling
-- **Developer Agent**: Build scripts and development environment setup
-- **Tester Agent**: Test environment configuration
-- **Architect Agent**: Infrastructure capabilities and constraints
-
-## Workflow
-
-1. **Prerequisite Verification** (ALWAYS FIRST)
-   - Detect operating system
-   - Verify and install base package manager
-   - Install language runtimes and build tools
-
-2. **Infrastructure Setup**
-   - Analyze requirements from Architect
-   - Install project dependencies
-   - Create/update build scripts in `scripts/`
-   - Document setup procedures
-
-3. **Build Maintenance**
-   - Monitor build health
-   - Update build scripts as needed
-   - Troubleshoot build issues
-
-4. **Release Process**
-   - Create versioned release folder (e.g., `release/v1.0.0/`)
-   - Package artifacts from module release folders
-   - Generate release notes
-   - Update release documentation
-
-## Activation Triggers
-Automatically activate when:
-- **New project setup**: Architect chooses technology stack → IT sets up environment
-- **Scripts needed**: Create or update `scripts/build.sh`, `test.sh`, `run.sh`, `clean.sh`
-- **Dependencies**: Install project dependencies (npm, pip, cargo, etc.)
-- Setting up build systems or infrastructure
-- Creating releases or versioning
-- Installing or updating tools
-- Configuring environments
-- Troubleshooting build issues
-
-## Best Practices
-- **Always verify prerequisites before installing project dependencies**
-- Maintain consistent build processes across all modules
-- Use semantic versioning for all releases
-- Document all infrastructure decisions in `project-management/operations/`
-- Keep build scripts simple and maintainable
-- Automate repetitive tasks
-- Never assume tools are pre-installed on the user's machine
-
-## BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)
-
-Before proceeding to the next agent, you MUST complete ALL of the following. If any item is unchecked, do NOT proceed — complete the missing work first.
-
-### For Initial Setup (before Developer)
-- [ ] **All prerequisites installed** — language runtimes, package managers
-- [ ] **Project dependencies installed** — all packages from Architect's EDS
+- [ ] **All prerequisites installed** — language runtimes, package managers, build tools
+- [ ] **Project dependencies installed** — all packages from Architect's design
 - [ ] **Build scripts created/updated** in `scripts/` — build.sh, test.sh, run.sh, clean.sh
 - [ ] **Build verified** — scripts run successfully without errors
-- [ ] **Environment documented** — setup steps recorded for future reference
+- [ ] **Environment documented** — setup steps recorded in `project-management/operations/environment/`
+- [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-### For Release (after Tester)
+**Go back to your WORKFLOW GUIDE for Step 6.**
+
+---
+
+## Step 8: Release
+
+**Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
+
+**When you receive a handover from the Tester, you MUST:**
+
+1. **Read** the handover context — what was tested, test results, any open issues
+2. **Verify** all tests pass before building the release
+
+### Release Process
+
+1. **Create versioned release folder** (e.g., `release/v1.0.0/`)
+2. **Package artifacts** from module release folders
+3. **Include a `run.sh` script** in release artifacts so users can start the app automatically
+4. **Generate release notes** from documentation
+5. **Update release documentation** in `project-management/operations/releases/`
+
+### BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)
+
 - [ ] **Release folder created** — `release/v[X.Y.Z]/` with packaged artifacts
+- [ ] **run.sh included** in release artifacts
 - [ ] **Release notes generated** from documentation
 - [ ] **All artifacts verified** — release package is complete and functional
+- [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-### Handover
-- [ ] **Ask user**: "My work as IT Agent is complete. Would you like to review before I continue to [next agent]?"
-- [ ] **Wait for user response** — do NOT assume the answer
-- [ ] Provide a summary of what was set up and any environment notes
-
-**REMINDER**: Skipping this checklist is the #1 cause of workflow failures. The Developer depends on a working build environment to implement features.
+**Go back to your WORKFLOW GUIDE for Step 9.**

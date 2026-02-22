@@ -228,7 +228,7 @@ template/agentic-workflow
         └─→ {llm-name}/tester-login-page-abc123 (Tester's work)
 ```
 
-See [Task-Based Branching Strategy](AI-WORKFLOW.md#task-based-branching-strategy) for details.
+See the Git Workflow section in your AI tool's workflow guide (CLAUDE.md, .cursorrules, etc.) for details.
 
 ---
 
@@ -278,7 +278,6 @@ your-project/
 ├── modules/              ← Your software code
 ├── scripts/              ← Build, test, run scripts
 ├── output/               ← Built software
-└── AI-WORKFLOW.md        ← Full workflow documentation
 ```
 
 ---
@@ -316,7 +315,7 @@ your-project/
 
 ### AI doesn't follow the workflow
 - The AI config files (CLAUDE.md, .cursorrules, etc.) instruct the AI
-- If issues persist, tell the AI: "Please follow the agentic workflow in AI-WORKFLOW.md"
+- If issues persist, tell the AI: "Please follow the workflow guide" (this is the provider file: CLAUDE.md, .cursorrules, etc.)
 
 ### AI gives wrong answers
 - Be more specific in your request
@@ -331,7 +330,7 @@ your-project/
 
 ### Need more help?
 - See `ai-assistants/how-to-use.md` for detailed guide
-- See `AI-WORKFLOW.md` for full workflow documentation
+- See your AI tool's workflow guide (CLAUDE.md, .cursorrules, etc.) for full workflow documentation
 
 ---
 

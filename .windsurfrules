@@ -113,7 +113,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 **MANDATORY before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
 1. Commit and push your work
 2. Check user preferences for handover behavior. If no preference exists:
-   Ask the user: "Would you like me to create a PR for review, or continue to Step 5?"
+   Ask the user: "Would you like me to create a PR for review, or should I hand over to IT Agent for Project Setup?"
    Wait for the user's response — do NOT skip this step
 3. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 
@@ -128,7 +128,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 **MANDATORY before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
 1. Commit and push your work
 2. Check user preferences for handover behavior. If no preference exists:
-   Ask the user: "Would you like me to create a PR for review, or continue to Step 6?"
+   Ask the user: "Would you like me to create a PR for review, or should I hand over to Developer Agent for Implementation?"
    Wait for the user's response — do NOT skip this step
 3. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 
@@ -146,7 +146,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
    - Mac/Linux: `bash scripts/run.sh`
    - Windows: `scripts\run.ps1`
 3. Check user preferences for handover behavior. If no preference exists:
-   Ask the user: "Would you like me to create a PR for review, or continue to Step 7?"
+   Ask the user: "Would you like me to create a PR for review, or should I hand over to Tester Agent for Validation?"
    Wait for the user's response — do NOT skip this step
 4. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 
@@ -164,7 +164,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
    - Mac/Linux: `bash scripts/test.sh`
    - Windows: `scripts\test.ps1`
 3. Check user preferences for handover behavior. If no preference exists:
-   Ask the user: "Would you like me to create a PR for review, or continue to Step 8?"
+   Ask the user: "Would you like me to create a PR for review, or should I hand over to IT Agent for Release?"
    Wait for the user's response — do NOT skip this step
 4. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 
@@ -179,7 +179,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 **MANDATORY before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
 1. Commit and push your work
 2. Check user preferences for handover behavior. If no preference exists:
-   Ask the user: "Would you like me to create a PR for review, or continue to Step 9?"
+   Ask the user: "Would you like me to create a PR for review, or should I hand over to Product Owner Agent for Acceptance?"
    Wait for the user's response — do NOT skip this step
 3. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 

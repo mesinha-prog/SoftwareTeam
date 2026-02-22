@@ -1,116 +1,146 @@
-# GitHub Copilot Instructions (Local Mode)
+# Workflow Guide (Local Mode)
 
-**CRITICAL**: You MUST follow the multi-agent agentic workflow defined in this repository.
+**This file is your WORKFLOW GUIDE.** After completing each step in an agent file, you will be directed back here for the next step.
 
----
+CRITICAL: For ANY user task, follow these steps IN ORDER. Do NOT skip steps.
 
-## MANDATORY FIRST STEPS
-
-1. **READ `AI-WORKFLOW.md`** - This is your primary reference for the complete workflow, protocols, and reading order
-2. **Follow the reading order defined in AI-WORKFLOW.md** - It tells you which agent file to read at each step
-
-### Mandatory Files to Reference
-
-| File | Purpose |
-|------|---------|
-| `AI-WORKFLOW.md` | Complete workflow instructions (START HERE) |
-| `ai-assistants/agents/product-owner-agent.md` | Requirements & coordination role |
-| `ai-assistants/agents/architect-agent.md` | Design responsibilities |
-| `ai-assistants/agents/developer-agent.md` | Implementation rules |
-| `ai-assistants/agents/it-agent.md` | Infrastructure rules (NO application code!) |
-| `ai-assistants/agents/tester-agent.md` | Testing rules |
-| `ai-assistants/agents/cost-analyst-agent.md` | Cost estimation |
+**BEFORE ANY STEP**: Read `ai-assistants/memory.md` first. User preferences stored in memory override all instructions below — even those marked MANDATORY. If the user has expressed a preference about handover behavior or any other workflow aspect, follow the preference instead of the default instruction.
 
 ---
 
-## AGENTIC WORKFLOW (ALWAYS FOLLOW)
+## Step 1: IT Agent — Verify Tools
 
-For ANY user task, follow the steps defined in `AI-WORKFLOW.md`. Summary:
-
-1. **Product Owner** (FIRST) → Clarify requirements, create user story
-2. **Cost Analyst** → Estimate total task cost, warn if expensive (advisory)
-3. **Architect** → Technical design, choose tech stack
-4. **IT Agent** (Setup) → Install prerequisites + project dependencies, set up scripts/
-5. **Developer** → Implement in modules/
-6. **Tester** → Validate implementation
-7. **IT Agent** (Release) → Build artifacts
-8. **Product Owner** (Acceptance) → Review and present to user
+Read `ai-assistants/agents/it-agent.md`, go to "Step 1: Verify Tools".
+Verify that required tools are installed.
+Complete the BEFORE HANDING OFF checklist in that file, then come back here for Step 2.
 
 ---
 
-## MANDATORY HANDOVER PROTOCOL (CRITICAL - DO NOT SKIP)
+## Step 2: Product Owner — Requirements
 
-**When you finish your work as an agent, follow the handover rules for your current role.**
-
-**IT Agent after verifying tools and dependencies:**
-Continue directly to Product Owner. No need to ask the user.
-
-**Product Owner after creating the user story:**
-Continue directly to Cost Analyst. No need to ask the user.
-
-**Cost Analyst after completing the cost estimate:**
-Report the cost estimate to the user. If the user approves, continue directly to Architect.
-
-**Architect after completing the design:**
-Stop. Save all work. Ask the user: "Would you like to review my work, or continue directly to IT Agent for project setup?" Wait for the user's response before proceeding.
-
-**IT Agent after setting up the project:**
-Stop. Save all work. Ask the user: "Would you like to review my work, or continue directly to Developer?" Wait for the user's response before proceeding.
-
-**Developer after completing the implementation:**
-Stop. Save all work. Provide the one-line command to run the app. Ask the user: "Would you like to review my work, or continue directly to Tester?" Wait for the user's response before proceeding.
-
-**Tester after completing validation:**
-Stop. Save all work. Provide the one-line command to run the tests. Ask the user: "Would you like to review my work, or continue directly to IT Agent for release?" Wait for the user's response before proceeding.
-
-**IT Agent after building the release:**
-Stop. Save all work. Ask the user: "Would you like to review my work, or continue directly to Product Owner for acceptance?" Wait for the user's response before proceeding.
-
-**Product Owner for acceptance:**
-Present the completed work to the user with the run and test commands. Ask the user to review and accept.
+Read `ai-assistants/agents/product-owner-agent.md`, go to "Step 2: Requirements".
+Clarify requirements with the user and create a user story.
+Complete the BEFORE HANDING OFF checklist in that file, then come back here for Step 3.
 
 ---
 
-## SWITCHING BETWEEN AGENTS
+## Step 3: Cost Analyst — Cost Estimate
 
-When switching to a different agent role, announce it clearly:
+Read `ai-assistants/agents/cost-analyst-agent.md`, go to "Step 3: Cost Estimate".
+Estimate total task cost and warn the user if expensive.
+Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-```
----
-SWITCHING TO: [Agent Name] Agent
-REASON: [Why switching]
----
-
-[Now acting as Agent Name]
-[Continue with agent-specific work]
-```
+**MANDATORY before moving on:**
+1. Report the cost estimate to the user
+2. If the user approves, continue to Step 4
+3. If the user wants to adjust scope, go back to Step 2
 
 ---
 
-## COPILOT-SPECIFIC NOTES
+## Step 4: Architect — Design
+
+Read `ai-assistants/agents/architect-agent.md`, go to "Step 4: Design".
+Create the technical design and choose the tech stack.
+Complete the BEFORE HANDING OFF checklist in that file, then come back here.
+
+**MANDATORY before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+1. Check user preferences for handover behavior. If no preference exists:
+   Ask the user: "Would you like to review my work before I hand over to IT Agent for Project Setup?"
+   Wait for the user's response — do NOT skip this step
+
+---
+
+## Step 5: IT Agent — Project Setup
+
+Read `ai-assistants/agents/it-agent.md`, go to "Step 5: Project Setup".
+Install project dependencies and create build/test/run scripts.
+Complete the BEFORE HANDING OFF checklist in that file, then come back here.
+
+**MANDATORY before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+1. Check user preferences for handover behavior. If no preference exists:
+   Ask the user: "Would you like to review my work before I hand over to Developer Agent for Implementation?"
+   Wait for the user's response — do NOT skip this step
+
+---
+
+## Step 6: Developer — Implementation
+
+Read `ai-assistants/agents/developer-agent.md`, go to "Step 6: Implementation".
+Implement the feature according to Architect's design.
+Complete the BEFORE HANDING OFF checklist in that file, then come back here.
+
+**MANDATORY before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+1. Provide the one-line command to run the app:
+   - Mac/Linux: `bash scripts/run.sh`
+   - Windows: `scripts\run.ps1`
+2. Check user preferences for handover behavior. If no preference exists:
+   Ask the user: "Would you like to review my work before I hand over to Tester Agent for Validation?"
+   Wait for the user's response — do NOT skip this step
+
+---
+
+## Step 7: Tester — Validation
+
+Read `ai-assistants/agents/tester-agent.md`, go to "Step 7: Validation".
+Validate the implementation with tests.
+Complete the BEFORE HANDING OFF checklist in that file, then come back here.
+
+**MANDATORY before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+1. Provide the one-line command to run the tests:
+   - Mac/Linux: `bash scripts/test.sh`
+   - Windows: `scripts\test.ps1`
+2. Check user preferences for handover behavior. If no preference exists:
+   Ask the user: "Would you like to review my work before I hand over to IT Agent for Release?"
+   Wait for the user's response — do NOT skip this step
+
+---
+
+## Step 8: IT Agent — Release
+
+Read `ai-assistants/agents/it-agent.md`, go to "Step 8: Release".
+Build release artifacts.
+Complete the BEFORE HANDING OFF checklist in that file, then come back here.
+
+**MANDATORY before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+1. Check user preferences for handover behavior. If no preference exists:
+   Ask the user: "Would you like to review my work before I hand over to Product Owner Agent for Acceptance?"
+   Wait for the user's response — do NOT skip this step
+
+---
+
+## Step 9: Product Owner — Acceptance
+
+Read `ai-assistants/agents/product-owner-agent.md`, go to "Step 9: Acceptance".
+Review the completed work and present to the user.
+
+**MANDATORY:**
+1. Provide the run command and test command to the user
+2. Ask the user to review and accept the work
+
+---
+
+## Prompting Copilot for Agent Roles
+
+- "Act as the IT Agent (follow ai-assistants/agents/it-agent.md) and verify tools are installed"
+- "Act as the Product Owner (follow ai-assistants/agents/product-owner-agent.md) and create a user story for [feature]"
+- "Act as the Cost Analyst (follow ai-assistants/agents/cost-analyst-agent.md) and estimate the cost for this task"
+- "Act as the Architect (follow ai-assistants/agents/architect-agent.md) and design the technical solution"
+- "Act as the Developer (follow ai-assistants/agents/developer-agent.md) and implement [feature]"
+- "Act as the Tester (follow ai-assistants/agents/tester-agent.md) and validate the implementation"
+
+---
+
+## Copilot-Specific Notes
 
 1. **Enable instruction files**: Ensure `github.copilot.chat.codeGeneration.useInstructionFiles` is `true` in VS Code settings (see `.vscode/settings.json`)
 2. **Manual agent transitions**: Explicitly tell Copilot which agent role to adopt
 3. **Context limitations**: Keep relevant agent file open for context
 
-### Prompting Copilot for Agent Roles
-
-- "Act as the Product Owner agent and create a user story for [feature]"
-- "Act as the Architect agent and design the technical solution for [user story]"
-- "Act as the IT Agent and set up the project dependencies (DO NOT write application code)"
-- "Act as the Developer agent and implement [feature] according to the architect's design"
-- "Act as the Tester agent and validate the implementation"
-
 ---
 
-## CRITICAL RULES - NEVER VIOLATE
+## Updating Memory
 
-1. **Product Owner runs FIRST** - For ANY new user request
-2. **ALWAYS follow the Handover Protocol** - At every agent transition
-3. **ALWAYS read `AI-WORKFLOW.md`** - It is the source of truth for all protocols
-4. **NEVER let IT Agent write application code** - Only infrastructure!
-5. **NEVER skip an agent** - Follow the complete workflow
-
----
-
-**For complete workflow details, protocols, and processes, see `AI-WORKFLOW.md`**
+After completing any step, update memory if any of these happened:
+- **User expressed a preference** → save to `ai-assistants/memory/user-preferences.md`
+- **A project decision was made** (tech stack, architecture, conventions) → save to `ai-assistants/memory/project-decisions.md`
+- **A mistake was made and corrected** → save to `ai-assistants/memory/mistakes-and-fixes.md` under the appropriate agent section

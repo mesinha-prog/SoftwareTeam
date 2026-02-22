@@ -129,4 +129,4 @@ Replace with your project's domain expertise (healthcare, finance, e-commerce, e
 
 ## Documentation
 
-See `AI-WORKFLOW.md` for full workflow documentation.
+See your AI tool's workflow guide (CLAUDE.md, .cursorrules, etc.) for full workflow documentation.

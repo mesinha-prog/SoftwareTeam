@@ -81,7 +81,7 @@ When you interact with the AI, it will automatically:
 ### What Happens on First Request
 
 When you give the AI its first task, the Product Owner will:
-1. Update `AI-WORKFLOW.md` with your project's domain information
+1. Update agent files in `ai-assistants/agents/` with your project's domain information
 2. Update agent skills in `ai-assistants/agents/` for your project type
 3. Create a user story documenting your request
 4. Then proceed with the normal workflow
@@ -161,4 +161,4 @@ your-project/
 
 - **Agent definitions**: See `ai-assistants/agents/`
 - **Provider setup**: See `ai-assistants/provider-setup/README.md`
-- **Workflow details**: See `AI-WORKFLOW.md` in project root
+- **Workflow details**: See your AI tool's workflow guide (CLAUDE.md, .cursorrules, etc.) in project root

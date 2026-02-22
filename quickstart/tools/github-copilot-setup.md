@@ -143,7 +143,7 @@ echo "LLM_API_KEY: $([ -n "$LLM_API_KEY" ] && echo 'Set ‚úÖ' || echo 'NOT SET ‚ù
 With GitHub Copilot in VS Code:
 1. Open your project folder
 2. Open Copilot Chat (Ctrl+Shift+I or Cmd+Shift+I)
-3. Tell Copilot: "Follow the agentic workflow in AI-WORKFLOW.md"
+3. Tell Copilot: "Follow the workflow guide in .github/copilot-instructions.md"
 4. Describe what you want to build
 
 ## Example Usage

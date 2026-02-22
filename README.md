@@ -163,8 +163,7 @@ git push -u origin main
 │
 ├── output/                  # Combined build output (all modules)
 ├── Makefile                 # Top-level build script
-├── .github/workflows/       # GitHub Actions
-└── AI-WORKFLOW.md           # Main workflow documentation
+└── .github/workflows/       # GitHub Actions
 ```
 
 ## How It Works

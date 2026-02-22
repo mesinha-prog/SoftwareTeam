@@ -114,7 +114,6 @@ cursor .         # For Cursor IDE
 │
 ├── output/                  # Combined build output (all modules)
 ├── Makefile                 # Top-level build script
-└── AI-WORKFLOW.md           # Main workflow documentation
 ```
 
 ## How It Works

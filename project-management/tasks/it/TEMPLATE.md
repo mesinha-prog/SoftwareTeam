@@ -26,7 +26,7 @@ Clear, concise description of what needs to be accomplished.
 - [ ] Specific deliverable 1
 - [ ] Specific deliverable 2
 - [ ] Documentation in docs/it/
-- [ ] Update AI-WORKFLOW.md if structure changes
+- [ ] Update workflow guide (provider files) if structure changes
 
 ## Acceptance Criteria
 - Criterion 1: How to verify success

@@ -222,7 +222,7 @@ For each PR, the workflow:
 - [ ] Code follows project standards and conventions
 - [ ] Commit messages are clear and descriptive
 - [ ] PR description explains what, why, and how
-- [ ] Documentation is updated (AI-WORKFLOW.md, README, etc.)
+- [ ] Documentation is updated (README, workflow guide, etc.)
 
 **Design and Architecture**:
 - [ ] Design patterns are correctly applied

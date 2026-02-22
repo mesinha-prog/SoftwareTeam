@@ -2,7 +2,6 @@
 
 # Read files at startup to understand the workflow
 read:
-  - AI-WORKFLOW.md
   - ai-assistants/agents/product-owner-agent.md
   - CLAUDE.md
 
