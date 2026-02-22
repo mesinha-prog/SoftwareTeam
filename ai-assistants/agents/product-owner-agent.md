@@ -94,12 +94,16 @@ When starting the FIRST task in a NEW project, you MUST update domain expertise 
 
 **Do NOT skip this step. Misunderstood requirements waste everyone's time.**
 
-### Create Task Branch
+### Create Branches
+
+Create the task branch, then your agent branch (your workflow guide specifies the exact branch prefix):
 
 ```bash
 git checkout template/agentic-workflow-gui
 git checkout -b master_{task_name}
 git push -u origin master_{task_name}
+# Then create your agent branch from the task branch
+# (see your workflow guide for the exact branch name)
 ```
 
 ### Create User Story
@@ -138,6 +142,7 @@ Save in `project-management/tasks/backlog/{task-name}.md`:
 - [ ] **User story created** in `project-management/tasks/backlog/{task-name}.md`
 - [ ] **Acceptance criteria** clearly defined in the user story
 - [ ] **Task branch created** from `template/agentic-workflow-gui`: `master_{task_name}`
+- [ ] **Agent branch created** from the task branch (as directed by your workflow guide)
 - [ ] **User story committed and pushed** to the task branch
 - [ ] **User has confirmed** the requirements are correct
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`

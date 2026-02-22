@@ -21,9 +21,13 @@ All work in this project is organized using Git branches at two levels:
 ```
 template/agentic-workflow-gui                              ← template branch (never modified directly)
   └── master_{task_name}                                   ← task branch (one per user request)
-        ├── windsurf/architect-{task_name}-{sessionID}     ← Architect's work → merges back to task branch
-        ├── windsurf/developer-{task_name}-{sessionID}     ← Developer's work → merges back to task branch
-        └── windsurf/tester-{task_name}-{sessionID}        ← Tester's work → merges back to task branch
+        ├── windsurf/product-owner-{task_name}-{sessionID}     ← Product Owner's work → merges back to task branch
+        ├── windsurf/cost-analyst-{task_name}-{sessionID}      ← Cost Analyst's work → merges back to task branch
+        ├── windsurf/architect-{task_name}-{sessionID}         ← Architect's work → merges back to task branch
+        ├── windsurf/it-{task_name}-{sessionID}                ← IT's work (setup) → merges back to task branch
+        ├── windsurf/developer-{task_name}-{sessionID}         ← Developer's work → merges back to task branch
+        ├── windsurf/tester-{task_name}-{sessionID}            ← Tester's work → merges back to task branch
+        └── windsurf/it-release-{task_name}-{sessionID}        ← IT's work (release) → merges back to task branch
 ```
 
 ### Branch naming
@@ -77,36 +81,85 @@ gh pr create --base master_{task_name} \
 
 ## Step 1: IT Agent — Verify Tools
 
-Read `ai-assistants/agents/it-agent.md`, go to "Step 1: Verify Tools".
+**Announce yourself**: Tell the user which agent you are and what you'll do in this step.
+
+Read `ai-assistants/agents/it-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 1: Verify Tools".
 Verify that git and gh CLI are installed and authenticated.
-Complete the BEFORE HANDING OFF checklist in that file, then come back here for Step 2.
+Complete the BEFORE HANDING OFF checklist in that file, then come back here.
+
+**MANDATORY before moving on:**
+1. Present the tool verification results to the user
+2. Ask the user: "Tools are verified. Shall I hand over to Product Owner Agent for Requirements?"
+   Wait for the user's response — do NOT skip this step
 
 ---
 
 ## Step 2: Product Owner — Requirements
 
-Read `ai-assistants/agents/product-owner-agent.md`, go to "Step 2: Requirements".
+**Announce yourself**: Tell the user which agent you are and what you'll do in this step.
+
+Read `ai-assistants/agents/product-owner-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 2: Requirements".
+
+If this is the first task in the project (agent files still have placeholder "CUSTOMIZE THIS SECTION" text), you MUST update the domain expertise sections in ALL agent files before creating the user story.
+
+Create the task branch, then create your agent branch:
+```bash
+git checkout template/agentic-workflow-gui
+git checkout -b master_{task_name}
+git push -u origin master_{task_name}
+git checkout -b windsurf/product-owner-{task_name}-{sessionID}
+```
+
 Clarify requirements with the user and create a user story.
-Complete the BEFORE HANDING OFF checklist in that file, then come back here for Step 3.
+Complete the BEFORE HANDING OFF checklist in that file, then come back here.
+
+**MANDATORY before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+1. Commit and push your work
+2. Present the user story to the user for confirmation
+3. Check user preferences for handover behavior. If no preference exists:
+   Ask the user: "Would you like me to create a PR for review, or should I hand over to Cost Analyst Agent for Cost Estimate?"
+   Wait for the user's response — do NOT skip this step
+4. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 
 ---
 
 ## Step 3: Cost Analyst — Cost Estimate
 
-Read `ai-assistants/agents/cost-analyst-agent.md`, go to "Step 3: Cost Estimate".
+**Announce yourself**: Tell the user which agent you are and what you'll do in this step.
+
+Read `ai-assistants/agents/cost-analyst-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 3: Cost Estimate".
+
+Create your agent branch:
+```bash
+git checkout master_{task_name}
+git checkout -b windsurf/cost-analyst-{task_name}-{sessionID}
+```
+
 Estimate total task cost and warn the user if expensive.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY before moving on:**
-1. Report the cost estimate to the user
-2. If the user approves, continue to Step 4
-3. If the user wants to adjust scope, go back to Step 2
+**MANDATORY before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+1. Commit and push your work
+2. Report the cost estimate to the user
+3. Ask the user: "The estimated cost is $X. Should I hand over to Architect Agent for Design, create a PR for review, or would you like to adjust the scope?"
+   Wait for the user's response — do NOT skip this step
+4. If the user wants to adjust scope, go back to Step 2
+5. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 
 ---
 
 ## Step 4: Architect — Design
 
-Read `ai-assistants/agents/architect-agent.md`, go to "Step 4: Design".
+**Announce yourself**: Tell the user which agent you are and what you'll do in this step.
+
+Read `ai-assistants/agents/architect-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 4: Design".
+
+Create your agent branch:
+```bash
+git checkout master_{task_name}
+git checkout -b windsurf/architect-{task_name}-{sessionID}
+```
+
 Create the technical design and choose the tech stack.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
@@ -121,7 +174,16 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ## Step 5: IT Agent — Project Setup
 
-Read `ai-assistants/agents/it-agent.md`, go to "Step 5: Project Setup".
+**Announce yourself**: Tell the user which agent you are and what you'll do in this step.
+
+Read `ai-assistants/agents/it-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 5: Project Setup".
+
+Create your agent branch:
+```bash
+git checkout master_{task_name}
+git checkout -b windsurf/it-{task_name}-{sessionID}
+```
+
 Install project dependencies and create build/test/run scripts.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
@@ -136,7 +198,16 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ## Step 6: Developer — Implementation
 
-Read `ai-assistants/agents/developer-agent.md`, go to "Step 6: Implementation".
+**Announce yourself**: Tell the user which agent you are and what you'll do in this step.
+
+Read `ai-assistants/agents/developer-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 6: Implementation".
+
+Create your agent branch:
+```bash
+git checkout master_{task_name}
+git checkout -b windsurf/developer-{task_name}-{sessionID}
+```
+
 Implement the feature according to Architect's design.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
@@ -154,7 +225,16 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ## Step 7: Tester — Validation
 
-Read `ai-assistants/agents/tester-agent.md`, go to "Step 7: Validation".
+**Announce yourself**: Tell the user which agent you are and what you'll do in this step.
+
+Read `ai-assistants/agents/tester-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 7: Validation".
+
+Create your agent branch:
+```bash
+git checkout master_{task_name}
+git checkout -b windsurf/tester-{task_name}-{sessionID}
+```
+
 Validate the implementation with tests.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
@@ -172,7 +252,16 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ## Step 8: IT Agent — Release
 
-Read `ai-assistants/agents/it-agent.md`, go to "Step 8: Release".
+**Announce yourself**: Tell the user which agent you are and what you'll do in this step.
+
+Read `ai-assistants/agents/it-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 8: Release".
+
+Create your agent branch:
+```bash
+git checkout master_{task_name}
+git checkout -b windsurf/it-release-{task_name}-{sessionID}
+```
+
 Build release artifacts.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
@@ -187,7 +276,9 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ## Step 9: Product Owner — Acceptance
 
-Read `ai-assistants/agents/product-owner-agent.md`, go to "Step 9: Acceptance".
+**Announce yourself**: Tell the user which agent you are and what you'll do in this step.
+
+Read `ai-assistants/agents/product-owner-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 9: Acceptance".
 Review the completed work and present to the user.
 
 **MANDATORY:**

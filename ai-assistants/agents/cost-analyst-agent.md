@@ -45,6 +45,10 @@ Resource Analyst and Cost Optimization Specialist
 
 **Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
 
+### Create Agent Branch
+
+Your workflow guide will instruct you to create an agent branch from the task branch before starting work. Follow the branch naming in your workflow guide.
+
 ### Task Analysis
 
 **When asked to estimate costs, you MUST ask:**
@@ -128,6 +132,7 @@ Save in `project-management/operations/cost-logs/`:
 
 ### BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)
 
+- [ ] **Agent branch created** from the task branch (as directed by your workflow guide)
 - [ ] **Cost estimate document created** in `project-management/operations/cost-logs/`
 - [ ] **Token usage breakdown** provided per agent role
 - [ ] **Total estimated cost** calculated and clearly stated
