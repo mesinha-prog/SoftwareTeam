@@ -259,9 +259,10 @@ body {
 }
 
 .btn-skip {
-  background: transparent;
+  background: #eff6ff;
   color: var(--primary);
   border: 1px solid var(--primary);
+  font-weight: 600;
 }
 
 .btn-skip:hover:not(:disabled) {
