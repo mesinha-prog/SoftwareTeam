@@ -46,6 +46,7 @@ def handle_api(path, body=None):
         "/api/local/copy": api_local_copy,
         "/api/paths/suggested": api_suggested_paths,
         "/api/paths/browse": api_browse_folder,
+        "/api/wizard/minimize": api_wizard_minimize,
         "/api/shutdown": api_shutdown,
         "/api/debug": api_debug,
     }
@@ -579,6 +580,14 @@ def api_suggested_paths():
 def api_browse_folder():
     """Open native OS folder picker dialog and return selected path."""
     return browse_folder()
+
+
+# --- Wizard Control ---
+
+def api_wizard_minimize():
+    """Minimize the wizard browser window so the launched tool is visible."""
+    installer = _get_installer()
+    return installer.minimize_wizard_window()
 
 
 # --- Shutdown ---

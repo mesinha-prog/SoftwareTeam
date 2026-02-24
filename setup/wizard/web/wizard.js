@@ -557,9 +557,14 @@ async function launchTool() {
   });
 
   if (result.success) {
-    showAlert('tool-alerts', `${result.message}<br><small>If you don't see it, check your taskbar.</small>`, 'success');
+    showAlert('tool-alerts', `${result.message}<br><small>Minimizing wizard...</small>`, 'success');
     btn.textContent = '✓ Launched';
     btn.disabled = true;
+
+    // Wait a moment for the tool to start, then minimize the wizard window
+    setTimeout(async () => {
+      await api('/api/wizard/minimize', {});
+    }, 500);
   } else {
     showAlert('tool-alerts', result.message, 'danger');
     btn.textContent = 'Launch';

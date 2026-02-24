@@ -229,3 +229,13 @@ def launch_ai_tool(tool, project_path):
     if result["success"]:
         return {"success": True, "message": f"{tool} launched at {project_path}"}
     return {"success": False, "message": f"Failed to launch {tool}: {result['stderr']}"}
+
+
+def minimize_wizard_window():
+    """Minimize the wizard browser window on macOS."""
+    # Use osascript to minimize the frontmost window (the browser)
+    script = '''osascript -e 'tell application "System Events" to keystroke "m" using {option down, command down}' '''
+    result = run(script)
+    if result["success"]:
+        return {"success": True, "message": "Wizard minimized"}
+    return {"success": True, "message": "Wizard window minimization may not be available"}

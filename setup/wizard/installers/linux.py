@@ -353,3 +353,24 @@ def launch_ai_tool(tool, project_path):
         return {"success": False, "message": "No supported terminal emulator found"}
 
     return {"success": False, "message": f"Unknown tool: {tool}"}
+
+
+def minimize_wizard_window():
+    """Minimize the wizard browser window using available Linux tools."""
+    # Try wmctrl first (most reliable but not always installed)
+    if is_installed("wmctrl"):
+        result = run("wmctrl -l | grep -i firefox | head -1 | awk '{print $1}' | xargs -I{} wmctrl -ic {}")
+        if result["success"]:
+            return {"success": True, "message": "Wizard minimized"}
+        # Try Chrome/Chromium
+        result = run("wmctrl -l | grep -i chrome | head -1 | awk '{print $1}' | xargs -I{} wmctrl -ic {}")
+        if result["success"]:
+            return {"success": True, "message": "Wizard minimized"}
+
+    # Fall back to xdotool if available
+    if is_installed("xdotool"):
+        result = run("xdotool search --name wizard windowminimize")
+        if result["success"]:
+            return {"success": True, "message": "Wizard minimized"}
+
+    return {"success": True, "message": "Wizard window minimization not available on this system"}
