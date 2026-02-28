@@ -203,38 +203,41 @@ def _install_aider():
 
 
 def launch_ai_tool(tool, project_path):
-    """Launch an AI tool pointed at the project directory.
+    """Launch an AI tool pointed at the project directory and bring it to front.
 
-    Uses launch() (fire-and-forget via subprocess.Popen) so the API call
-    returns immediately and the launched tool window appears on top.
+    Uses launch() (fire-and-forget via subprocess.Popen) to start the tool,
+    then explicitly activates it with osascript so it appears on top of the browser.
     """
-    launchers = {
-        "cursor": f'open -a Cursor "{project_path}"',
-        "windsurf": f'open -a Windsurf "{project_path}"',
-        "claude-code": None,  # handled specially
-        "vscode": f'open -a "Visual Studio Code" "{project_path}"',
-        "copilot": f'open -a "Visual Studio Code" "{project_path}"',
-        "aider": None,  # handled specially
+    # Map tool name to the macOS application name for `open -a` and `activate`
+    app_names = {
+        "cursor": "Cursor",
+        "windsurf": "Windsurf",
+        "vscode": "Visual Studio Code",
+        "copilot": "Visual Studio Code",
     }
 
     if tool == "claude-code":
-        script = f'''osascript -e 'tell application "Terminal" to do script "cd \\"{project_path}\\" && claude"' '''
+        # `do script` opens and activates Terminal automatically
+        script = f'''osascript -e 'tell application "Terminal" to do script "cd \\"{project_path}\\" && claude"' -e 'tell application "Terminal" to activate' '''
         launch(script)
         return {"success": True, "message": "Claude Code launched in Terminal"}
 
     if tool == "aider":
-        script = f'''osascript -e 'tell application "Terminal" to do script "cd \\"{project_path}\\" && aider"' '''
+        script = f'''osascript -e 'tell application "Terminal" to do script "cd \\"{project_path}\\" && aider"' -e 'tell application "Terminal" to activate' '''
         launch(script)
         return {"success": True, "message": "Aider launched in Terminal"}
 
-    cmd = launchers.get(tool)
-    if not cmd:
+    app = app_names.get(tool)
+    if not app:
         return {"success": False, "message": f"Cannot launch {tool}"}
 
-    result = launch(cmd)
-    if result["success"]:
-        return {"success": True, "message": f"{tool} launched at {project_path}"}
-    return {"success": False, "message": f"Failed to launch {tool}: {result['stderr']}"}
+    result = launch(f'open -a "{app}" "{project_path}"')
+    if not result["success"]:
+        return {"success": False, "message": f"Failed to launch {app}: {result['stderr']}"}
+
+    # Bring the app to front — open -a alone does not guarantee focus
+    run(f"osascript -e 'tell application \"{app}\" to activate'", timeout=5)
+    return {"success": True, "message": f"{app} launched"}
 
 
 def minimize_wizard_window():
