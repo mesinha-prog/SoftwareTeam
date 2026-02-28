@@ -519,8 +519,20 @@ async function saveLLMConfig() {
   }
 }
 
+// GitHub Actions modal
+function showActionsModal() {
+  const m = document.getElementById('actions-modal');
+  if (m) m.style.display = 'flex';
+}
+
+function closeActionsModal() {
+  const m = document.getElementById('actions-modal');
+  if (m) m.style.display = 'none';
+}
+
 // Screen 7: AI Tool Selection
 async function initToolSelect() {
+  if (state.workflowMode === 'github') showActionsModal();
   const data = await api('/api/tools/list');
   const grid = document.getElementById('tool-grid');
   grid.innerHTML = '';
@@ -660,11 +672,6 @@ function initVerification() {
   const fallbackPrompt = `Please read the file ${tool.file} in the project root and follow the workflow guide defined there. Start as the ${firstRole}.`;
   document.getElementById('fallback-prompt').textContent = fallbackPrompt;
 
-  // Issue 9: Show GitHub Actions enablement note only for GitHub mode
-  const actionsNote = document.getElementById('verify-github-actions');
-  if (actionsNote) {
-    actionsNote.style.display = state.workflowMode === 'github' ? '' : 'none';
-  }
 }
 
 // --- Utility functions ---
