@@ -111,22 +111,145 @@ function Ensure-Python {
     $ErrorActionPreference = $prevPref
 
     # Need to install Python 3
-    Write-Warn "Python 3 not found. Installing..."
+    Write-Warn "Python 3 not found. Installing automatically..."
 
+    $pyInstallLog = "$env:TEMP\python-install.log"
+    $pyInstalled  = $false
+
+    # Helper: show elapsed time while a process runs, kill it if it exceeds timeout.
+    # Returns $true if the process exited with code 0, $false otherwise.
+    function Show-InstallerProgress($proc, $timeoutSec, $label) {
+        $interval = 5
+        $elapsed  = 0
+        Write-Host -NoNewline "  $label"
+        while (-not $proc.WaitForExit($interval * 1000)) {
+            $elapsed += $interval
+            Write-Host -NoNewline " ${elapsed}s..."
+            if ($elapsed -ge $timeoutSec) {
+                Write-Host " [timed out after ${timeoutSec}s]"
+                try { $proc.Kill() } catch { }
+                return $false
+            }
+        }
+        Write-Host " [done in ${elapsed}s]"
+        return ($proc.ExitCode -eq 0)
+    }
+
+    # --- Method 1: winget ---
     $winget = Get-Command winget -ErrorAction SilentlyContinue
     if ($winget) {
         Write-Info "Installing Python 3 via winget..."
-        try {
-            & winget install Python.Python.3.12 --accept-package-agreements --accept-source-agreements 2>&1 | Out-Null
-        } catch { }
-    } else {
+        $wingetOut = & winget install Python.Python.3.12 --accept-package-agreements --accept-source-agreements 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Ok "Python 3 installed via winget."
+            $pyInstalled = $true
+        } else {
+            Write-Warn "winget failed (exit code $LASTEXITCODE). Output:"
+            $wingetOut | Select-Object -Last 10 | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray }
+        }
+    }
+
+    # --- Method 2: direct installer, user-level (no UAC needed) ---
+    if (-not $pyInstalled) {
         Write-Info "Downloading Python installer..."
-        $installerUrl = "https://www.python.org/ftp/python/3.12.0/python-3.12.0-amd64.exe"
+        $installerUrl  = "https://www.python.org/ftp/python/3.12.0/python-3.12.0-amd64.exe"
         $installerPath = "$env:TEMP\python-installer.exe"
-        Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
-        Write-Info "Running Python installer (this may take a minute)..."
-        Start-Process -FilePath $installerPath -ArgumentList "/quiet InstallAllUsers=0 PrependPath=1" -Wait
-        Remove-Item $installerPath -ErrorAction SilentlyContinue
+        try {
+            $ProgressPreference = 'SilentlyContinue'
+            Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath -UseBasicParsing
+            $ProgressPreference = 'Continue'
+        } catch {
+            Write-Warn "Download failed: $_"
+        }
+
+        if (Test-Path $installerPath) {
+            Write-Info "Running Python installer — attempt 1 (user-level, no admin needed)..."
+            $proc1 = Start-Process -FilePath $installerPath `
+                -ArgumentList "/quiet InstallAllUsers=0 PrependPath=1 /log `"$pyInstallLog`"" `
+                -PassThru
+            if (Show-InstallerProgress $proc1 300 "Installing") {
+                $pyInstalled = $true
+                Write-Ok "Python installed (user-level)."
+            } else {
+                $ec1 = if ($proc1.HasExited) { $proc1.ExitCode } else { "timed out" }
+                Write-Warn "Attempt 1 failed (exit code: $ec1). Installer log:"
+                if (Test-Path $pyInstallLog) {
+                    Get-Content $pyInstallLog -ErrorAction SilentlyContinue |
+                        Select-Object -Last 15 |
+                        ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray }
+                }
+            }
+
+            # --- Method 3: same installer, system-level (may trigger UAC prompt) ---
+            if (-not $pyInstalled) {
+                Write-Info "Retrying with elevated permissions — a UAC prompt may appear..."
+                try {
+                    $proc2 = Start-Process -FilePath $installerPath `
+                        -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1 /log `"$pyInstallLog`"" `
+                        -Verb RunAs -PassThru -ErrorAction Stop
+                    if (Show-InstallerProgress $proc2 300 "Installing (elevated)") {
+                        $pyInstalled = $true
+                        Write-Ok "Python installed (system-level)."
+                    } else {
+                        $ec2 = if ($proc2.HasExited) { $proc2.ExitCode } else { "timed out" }
+                        Write-Warn "Attempt 2 failed (exit code: $ec2). Installer log:"
+                        if (Test-Path $pyInstallLog) {
+                            Get-Content $pyInstallLog -ErrorAction SilentlyContinue |
+                                Select-Object -Last 15 |
+                                ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray }
+                        }
+                    }
+                } catch {
+                    Write-Warn "Could not launch elevated installer: $_"
+                }
+            }
+
+            Remove-Item $installerPath -ErrorAction SilentlyContinue
+            Remove-Item $pyInstallLog -ErrorAction SilentlyContinue
+        }
+    }
+
+    # --- Method 4: embeddable Python (no installer, no admin required) ---
+    if (-not $pyInstalled) {
+        Write-Info "Trying Python embeddable package (no installation or admin required)..."
+        $embedUrl = "https://www.python.org/ftp/python/3.12.0/python-3.12.0-embed-amd64.zip"
+        $embedZip = "$env:TEMP\python-embed.zip"
+        $embedDir = "$env:TEMP\python-embed-auto"
+        try {
+            $ProgressPreference = 'SilentlyContinue'
+            Invoke-WebRequest -Uri $embedUrl -OutFile $embedZip -UseBasicParsing
+            $ProgressPreference = 'Continue'
+            if (Test-Path $embedDir) { Remove-Item $embedDir -Recurse -Force }
+            Expand-Archive -Path $embedZip -DestinationPath $embedDir -Force
+            Remove-Item $embedZip -ErrorAction SilentlyContinue
+
+            # Uncomment 'import site' so pip and installed packages are accessible
+            $pthFile = Get-ChildItem "$embedDir\python*._pth" -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($pthFile) {
+                (Get-Content $pthFile.FullName) -replace '#import site', 'import site' |
+                    Set-Content $pthFile.FullName
+            }
+
+            # Bootstrap pip
+            Write-Info "Bootstrapping pip for embeddable Python..."
+            $getPipPath = "$embedDir\get-pip.py"
+            Invoke-WebRequest -Uri "https://bootstrap.pypa.io/get-pip.py" -OutFile $getPipPath -UseBasicParsing
+            & "$embedDir\python.exe" $getPipPath --quiet 2>&1 | Out-Null
+            Remove-Item $getPipPath -ErrorAction SilentlyContinue
+
+            $embedPython = "$embedDir\python.exe"
+            if (Test-Path $embedPython) {
+                Write-Ok "Python embeddable package ready."
+                $ErrorActionPreference = $prevPref
+                return $embedPython
+            }
+        } catch {
+            Write-Warn "Embeddable Python setup failed: $_"
+        }
+
+        Write-Err "All automatic Python installation methods failed."
+        Write-Err "Please check your internet connection and try running this script again."
+        exit 1
     }
 
     # Refresh PATH
