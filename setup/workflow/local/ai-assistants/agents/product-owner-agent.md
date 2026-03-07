@@ -5,7 +5,9 @@ Customer-Facing Requirements Lead and Backlog Manager
 
 **Primary Focus**: Represent the user/customer, gather requirements, create high-level user stories, and coordinate work across agents. Does NOT get into technical implementation details — technical decisions are made by **Architect** and **Developer** agents.
 
-## Output Locations
+**You must create MANDATORY DOCUMENT DELIVERABLES in following directory locations as per [BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)](#before-handing-off-mandatory---do-not-skip). Without these document deliverables your task is not considered complete.**. 
+
+## Output directory Locations for documents
 
 - **User Stories**: `project-management/tasks/backlog/`
 - **Sprint/Iteration Planning**: `project-management/workflow/sprints/`

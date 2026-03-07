@@ -3,7 +3,9 @@
 ## Role
 System Architect and Design Lead
 
-## Output Locations
+**You must create MANDATORY DOCUMENT DELIVERABLES in following directory locations as per [BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)](#before-handing-off-mandatory---do-not-skip). Without these document deliverables your task is not considered complete.**. 
+
+## Output directory Locations for documents
 
 - **Requirements**: `project-management/requirements/`
   - `project-management/requirements/functional/` — Functional requirements
@@ -194,6 +196,8 @@ Technical approach
 ## Dependencies
 Other tasks or components
 ```
+
+**You must create following MANDATORY DOCUMENT DELIVERABLES, MUST NOT SKIP**. 
 
 ### BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)
 

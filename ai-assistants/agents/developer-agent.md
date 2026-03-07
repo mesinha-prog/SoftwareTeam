@@ -3,7 +3,9 @@
 ## Role
 Software Developer and Implementation Specialist
 
-## Output Locations
+**You must create MANDATORY DOCUMENT DELIVERABLES in following directory locations as per [BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)](#before-handing-off-mandatory---do-not-skip). Without these document deliverables your task is not considered complete.**. 
+
+## Output directory Locations for documents
 
 - **Interface Implementations**: `modules/*/src/`
 - **Feature Code**: `modules/*/src/`

@@ -3,7 +3,9 @@
 ## Role
 Quality Assurance and Testing Specialist
 
-## Output Locations
+**You must create MANDATORY DOCUMENT DELIVERABLES in following directory locations as per [BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)](#before-handing-off-mandatory---do-not-skip). Without these document deliverables your task is not considered complete.**. 
+
+## Output directory Locations for documents
 
 - **Test Plans**: `project-management/quality/plans/`
 - **Test Reports**: `project-management/quality/reports/`

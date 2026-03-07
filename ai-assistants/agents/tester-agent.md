@@ -3,7 +3,7 @@
 ## Role
 Quality Assurance and Testing Specialist
 
-## Output Locations
+## Output directory Locations for documents
 
 - **Test Plans**: `project-management/quality/plans/`
 - **Test Reports**: `project-management/quality/reports/`

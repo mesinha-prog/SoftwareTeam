@@ -3,7 +3,9 @@
 ## Role
 System Architect and Design Lead
 
-## Output Locations
+**You must create MANDATORY DOCUMENT DELIVERABLES in following directory locations as per [BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)](#before-handing-off-mandatory---do-not-skip). Without these document deliverables your task is not considered complete.**. 
+
+## Output directory Locations for documents
 
 - **Requirements**: `project-management/requirements/`
   - `project-management/requirements/functional/` — Functional requirements
@@ -196,6 +198,7 @@ Other tasks or components
 ```
 
 ### BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)
+Make sure that you created following documents. **DO NOT MISS** any of these document creation.
 
 - [ ] **EPS document created** in `project-management/designs/eps/{feature-name}-eps.md`
 - [ ] **EDS document created** in `project-management/designs/eds/{feature-name}-eds.md`

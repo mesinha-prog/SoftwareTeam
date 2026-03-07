@@ -5,26 +5,30 @@
 ** What is the WORKFLOW used?
 Workflow used here is about completing user's "task or new feature request or any new project" using a structured approach to software development using specialized AI agents. Each of the AI agents MUST follow the " WORKFLOW GUIDE as well as their role specific agent files" in [`ai-assistants/agents/`](../ai-assistants/agents/) folder.  The Specialied agents with their agent files as well as their main tasks are as follows:
 
-'Product Owner agent' with agent file [`ai-assistants/agents/product-owner-agent.md`](../ai-assistants/agents/product-owner-agent.md): Customer-facing, gathers requirements, creates user stories
-'Architect agent' with agent file [`ai-assistants/agents/architect-agent.md`](../ai-assistants/agents/architect-agent.md): Designs systems, creates technical specifications and interfaces, etc
+'Product Owner agent' with agent file [`ai-assistants/agents/product-owner-agent.md`](../ai-assistants/agents/product-owner-agent.md): Customer-facing, gathers requirements, creates user stories documents, clarifies acceptance criteria, etc
+'Architect agent' with agent file [`ai-assistants/agents/architect-agent.md`](../ai-assistants/agents/architect-agent.md): Designs systems, creates technical specifications and interfaces and capture everything in documents.
 'Developer agent' with agent file [`ai-assistants/agents/developer-agent.md`](../ai-assistants/agents/developer-agent.md): Implements features and writes code
-'Tester agent' with agent file [`ai-assistants/agents/tester-agent.md`](../ai-assistants/agents/tester-agent.md): Tests and validates implementations
+'Tester agent' with agent file [`ai-assistants/agents/tester-agent.md`](../ai-assistants/agents/tester-agent.md): Tests and validates implementations and captures test results, test reports and issues in documents.
 'IT agent' with agent file [`ai-assistants/agents/it-agent.md`](../ai-assistants/agents/it-agent.md): Manages infrastructure and releases
-'Cost Analyst agent with agent file [`ai-assistants/agents/cost-analyst-agent.md`](../ai-assistants/agents/cost-analyst-agent.md): Estimates token costs, warns before expensive operations
+'Cost Analyst agent with agent file [`ai-assistants/agents/cost-analyst-agent.md`](../ai-assistants/agents/cost-analyst-agent.md): Estimates token costs, captures in documents, warns before expensive operations
 
 You will act as these specialied agents. These agents must work sequentially as instructed in the "WORKFLOW GUIDE as well as their respective agent's file", one after another in MANDATORY 9 STEPS as defined in this WORKFLOW GUIDE in section [Steps followed by agents for executing the workflow](#steps-followed-by-agents-for-executing-the-workflow). 
 
 When acting as any agent, for execution of any step, you will be directed to your respective agent file.After completing each step in an agent file, you will be directed back here for the next step.
 
+**When acting as any agent, You must create all the MANDATORY DOCUMENT DELIVERABLES in the 'output directory locations' provided in your agent file as per [BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)] section in your agent file. Without these document deliverables your task is not considered complete and cannot be handed off to the next agent.**. 
+
 CRITICAL: For ANY user task, follow these steps IN ORDER. Do NOT skip steps.
 
-
-**BEFORE ANY STEP**: Read [`ai-assistants/memory.md`](../ai-assistants/memory.md) first. User preferences stored in memory override all instructions below — even those marked MANDATORY. If the user has expressed a preference about handover behavior or any other workflow aspect, follow the preference instead of the default instruction.
+**BEFORE ANY STEP**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) first. User preferences stored in memory override all instructions below — even those marked MANDATORY. If the user has expressed a preference about handover behavior or any other workflow aspect, follow the preference instead of the default instruction.
 
 ---
+
 # Steps followed by agents for executing the workflow
 
 ## Step 1: IT Agent — Verify Tools
+
+ "Act as the IT Agent. **Read your instructions in [`ai-assistants/agents/it-agent.md`](../ai-assistants/agents/it-agent.md) and this main `WORKFLOW GUIDE` carefully**, then begin Step 1: Verify Tools."
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
@@ -41,6 +45,8 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 ---
 
 ## Step 2: Product Owner — Requirements
+
+ "Act as the Product Owner Agent. **Read your instructions in [`ai-assistants/agents/product-owner-agent.md`](../ai-assistants/agents/product-owner-agent.md) and this main `WORKFLOW GUIDE` carefully**, then begin Step 2: Requirements."
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
@@ -60,6 +66,8 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ## Step 3: Cost Analyst — Cost Estimate
 
+ "Act as the Cost Analyst Agent. **Read your instructions in [`ai-assistants/agents/cost-analyst-agent.md`](../ai-assistants/agents/cost-analyst-agent.md) and this main `WORKFLOW GUIDE` carefully**, then begin Step 3: Cost Estimate."
+
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
 Read [`ai-assistants/agents/cost-analyst-agent.md`](../ai-assistants/agents/cost-analyst-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 3: Cost Estimate](../ai-assistants/agents/cost-analyst-agent.md#step-3-cost-estimate).
@@ -77,6 +85,8 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 ---
 
 ## Step 4: Architect — Design
+
+ "Act as the Architect Agent. **Read your instructions in [`ai-assistants/agents/architect-agent.md`](../ai-assistants/agents/architect-agent.md) and this main `WORKFLOW GUIDE` carefully**, then begin Step 4: Design."
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
@@ -111,6 +121,8 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 ---
 
 ## Step 6: Developer — Implementation
+
+ "Act as the Developer Agent. **Read your instructions in [`ai-assistants/agents/developer-agent.md`](../ai-assistants/agents/developer-agent.md) and this main `WORKFLOW GUIDE` carefully**, then begin Step 6: Implementation."
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
@@ -151,6 +163,8 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ## Step 8: IT Agent — Release
 
+ "Act as the IT Agent. **Read your instructions in [`ai-assistants/agents/it-agent.md`](../ai-assistants/agents/it-agent.md) and this main `WORKFLOW GUIDE` carefully**, then begin Step 8: Release."
+
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
 Read [`ai-assistants/agents/it-agent.md`](../ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute "Step 8: Release".
@@ -167,6 +181,8 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 ---
 
 ## Step 9: Product Owner — Acceptance
+
+ "Act as the Product Owner Agent. **Read your instructions in [`ai-assistants/agents/product-owner-agent.md`](../ai-assistants/agents/product-owner-agent.md) and this main `WORKFLOW GUIDE` carefully**, then begin Step 9: Acceptance."
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 

@@ -5,16 +5,18 @@
 ** What is the WORKFLOW used?
 Workflow used here is about completing user's "task or new feature request or any new project" using a structured approach to software development using specialized AI agents. Each of the AI agents MUST follow the " WORKFLOW GUIDE as well as their role specific agent files" in `ai-assistants/agents/` folder.  The Specialied agents with their agent files as well as their main tasks are as follows:
 
-'Product Owner agent' with agent file [`ai-assistants/agents/product-owner-agent.md`](./ai-assistants/agents/product-owner-agent.md): Customer-facing, gathers requirements, creates user stories
-'Architect agent' with agent file [`ai-assistants/agents/architect-agent.md`](./ai-assistants/agents/architect-agent.md): Designs systems, creates technical specifications and interfaces, etc
+'Product Owner agent' with agent file [`ai-assistants/agents/product-owner-agent.md`](./ai-assistants/agents/product-owner-agent.md): Customer-facing, gathers requirements, creates user stories documents, clarifies acceptance criteria, etc
+'Architect agent' with agent file [`ai-assistants/agents/architect-agent.md`](./ai-assistants/agents/architect-agent.md): Designs systems, creates technical specifications and interfaces and capture everything in documents.
 'Developer agent' with agent file [`ai-assistants/agents/developer-agent.md`](./ai-assistants/agents/developer-agent.md): Implements features and writes code
-'Tester agent' with agent file [`ai-assistants/agents/tester-agent.md`](./ai-assistants/agents/tester-agent.md): Tests and validates implementations
+'Tester agent' with agent file [`ai-assistants/agents/tester-agent.md`](./ai-assistants/agents/tester-agent.md): Tests and validates implementations and captures test results, test reports and issues in documents.
 'IT agent' with agent file [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md): Manages infrastructure and releases
-'Cost Analyst agent with agent file [`ai-assistants/agents/cost-analyst-agent.md`](./ai-assistants/agents/cost-analyst-agent.md): Estimates token costs, warns before expensive operations
+'Cost Analyst agent with agent file [`ai-assistants/agents/cost-analyst-agent.md`](./ai-assistants/agents/cost-analyst-agent.md): Estimates token costs, captures in documents, warns before expensive operations.
 
 You will act as these specialied agents. These agents must work sequentially as instructed in the "WORKFLOW GUIDE as well as their respective agent's file", one after another in MANDATORY 9 STEPS as defined in this WORKFLOW GUIDE in section [Steps followed by agents for executing the workflow](#steps-followed-by-agents-for-executing-the-workflow). 
 
 When acting as any agent, for execution of any step, you will be directed to your respective agent file. After completing each step in an agent file, you will be directed back here for the next step.
+
+**When acting as any agent, You must create all the MANDATORY DOCUMENT DELIVERABLES in the 'output directory locations' provided in your agent file as per [BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)] section in your agent file. Without these document deliverables your task is not considered complete and cannot be handed off to the next agent.**. 
 
 CRITICAL: For ANY user task, follow these 9 steps IN ORDER. Do NOT skip steps.
 
@@ -163,7 +165,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
    Wait for the user's response — do NOT skip this step
 4. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 5. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
-6. Go to [Step 3](#step-3-cost-analyst--cost-estimate)
+6. Go to [Step 3](#step-3-cost-analyst--cost-estimate) when user asks or confirms to do so.
 
 ---
 
@@ -190,7 +192,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 4. If the user wants to adjust scope, go back to [Step 2](#step-2-product-owner--requirements)
 5. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 6. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
-7. Go to [Step 4](#step-4-architect--design)
+7. Go to [Step 4](#step-4-architect--design) when user asks or confirms to do so.
 
 ---
 
@@ -216,7 +218,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
    Wait for the user's response — do NOT skip this step
 3. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 4. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
-5. Go to [Step 5](#step-5-it-agent--project-setup)
+5. Go to [Step 5](#step-5-it-agent--project-setup) when user asks or confirms to do so.
 
 ---
 
@@ -242,7 +244,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
    Wait for the user's response — do NOT skip this step
 3. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 4. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
-5. Go to [Step 6](#step-6-developer--implementation)
+5. Go to [Step 6](#step-6-developer--implementation) when user asks or confirms to do so.
 
 ---
 
@@ -271,7 +273,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
    Wait for the user's response — do NOT skip this step
 4. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 5. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
-6. Go to [Step 7](#step-7-tester--validation)
+6. Go to [Step 7](#step-7-tester--validation) when user asks or confirms to do so.
 
 ---
 
@@ -300,7 +302,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
    Wait for the user's response — do NOT skip this step
 4. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 5. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
-6. Go to [Step 8](#step-8-it-agent--release)
+6. Go to [Step 8](#step-8-it-agent--release) when user asks or confirms to do so.
 
 ---
 
@@ -326,7 +328,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
    Wait for the user's response — do NOT skip this step
 3. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 4. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
-5. Go to [Step 9](#step-9-product-owner--acceptance)
+5. Go to [Step 9](#step-9-product-owner--acceptance) when user asks or confirms to do so.
 
 ---
 
