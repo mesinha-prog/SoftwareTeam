@@ -99,22 +99,22 @@ echo "Detected OS: $OS_TYPE"
 
 case "$OS_TYPE" in
   Linux*)
-    if command -v apt-get &> /dev/null; then
+    if command -v apt-get 2>&1 | grep -q '^/'; then
       PKG_MGR="apt-get"; sudo apt-get update -y
-    elif command -v dnf &> /dev/null; then
+    elif command -v dnf 2>&1 | grep -q '^/'; then
       PKG_MGR="dnf"; sudo dnf check-update || true
-    elif command -v yum &> /dev/null; then
+    elif command -v yum 2>&1 | grep -q '^/'; then
       PKG_MGR="yum"; sudo yum check-update || true
-    elif command -v pacman &> /dev/null; then
+    elif command -v pacman 2>&1 | grep -q '^/'; then
       PKG_MGR="pacman"; sudo pacman -Sy
-    elif command -v apk &> /dev/null; then
+    elif command -v apk 2>&1 | grep -q '^/'; then
       PKG_MGR="apk"; sudo apk update
-    elif command -v zypper &> /dev/null; then
+    elif command -v zypper 2>&1 | grep -q '^/'; then
       PKG_MGR="zypper"; sudo zypper refresh
     else
       PKG_MGR=""
       echo "⚠️  No package manager detected!"
-      cat /etc/os-release 2>/dev/null || echo "Unknown distro"
+      cat /etc/os-release 2>&1 || echo "Unknown distro"
       echo ""
       echo "Your distro's package manager should already be installed."
       echo "If this is a minimal/container image, install one:"
@@ -128,35 +128,38 @@ case "$OS_TYPE" in
     [ -n "$PKG_MGR" ] && echo "Package manager: $PKG_MGR"
     ;;
   Darwin*)
-    if ! command -v brew &> /dev/null; then
-      echo "Homebrew not found. Installing..."
-      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-      if [ -f /opt/homebrew/bin/brew ]; then
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-      elif [ -f /usr/local/bin/brew ]; then
-        eval "$(/usr/local/bin/brew shellenv)"
-      fi
+    if ! command -v brew 2>&1 | grep -q '^/'; then
+      echo "⚠️  Homebrew not found. Installing automatically..."
+      NONINTERACTIVE=1 /bin/bash -c "$(command -p /usr/bin/ruby -e "require 'open-uri'; puts URI.open('https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh').read" 2>&1 || echo 'echo Install failed')" || true
     fi
-    PKG_MGR="brew"
-    echo "Package manager: Homebrew ($(brew --version | head -1))"
+    if [ -f /opt/homebrew/bin/brew ]; then
+      export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+    elif [ -f /usr/local/bin/brew ]; then
+      export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
+    fi
+    if command -v brew 2>&1 | grep -q '^/'; then
+      PKG_MGR="brew"
+      echo "Package manager: Homebrew ($(brew --version | head -1))"
+    else
+      echo "❌ Homebrew installation failed. Agent cannot proceed without a package manager on macOS."
+    fi
     ;;
   MINGW*|MSYS*|CYGWIN*)
-    if command -v winget &> /dev/null; then
+    if command -v winget 2>&1 | grep -q 'winget'; then
       PKG_MGR="winget"
-    elif command -v choco &> /dev/null; then
+    elif command -v choco 2>&1 | grep -q 'choco'; then
       PKG_MGR="choco"
     else
-      echo "No package manager found. Installing Chocolatey..."
+      echo "⚠️  No package manager found. Installing Chocolatey automatically..."
       powershell -NoProfile -ExecutionPolicy Bypass -Command \
-        "[System.Net.ServicePointManager]::SecurityProtocol = 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
-      if command -v choco &> /dev/null; then
+        "[System.Net.ServicePointManager]::SecurityProtocol = 3072; " \
+        "Invoke-WebRequest -Uri 'https://community.chocolatey.org/install.ps1' -OutFile \"$env:TEMP\\choco-install.ps1\"; " \
+        "& \"$env:TEMP\\choco-install.ps1\"" || true
+      if command -v choco 2>&1 | grep -q 'choco'; then
         PKG_MGR="choco"
       else
         PKG_MGR=""
-        echo "⚠️  Could not auto-install Chocolatey."
-        echo "Run in PowerShell (Admin):"
-        echo "  Set-ExecutionPolicy Bypass -Scope Process -Force"
-        echo "  iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
+        echo "❌ Chocolatey installation failed. Agent cannot proceed without a package manager on Windows."
       fi
     fi
     [ -n "$PKG_MGR" ] && echo "Package manager: $PKG_MGR"
@@ -235,19 +238,22 @@ pkg_install() {
 ```bash
 check_and_install() {
   local cmd="$1" install_linux="$2" install_mac="$3" install_win="$4" label="$5"
-  if command -v "$cmd" &> /dev/null; then
+  if command -v "$cmd" 2>&1 | grep -q '^/'; then
     echo "✅ $label: $($cmd --version 2>&1 | head -1)"
     return 0
   fi
   echo "⚠️  $label not found. Installing..."
   case "$OS_TYPE" in
-    Linux*)              eval "$install_linux" ;;
-    Darwin*)             eval "$install_mac" ;;
-    MINGW*|MSYS*|CYGWIN*) eval "$install_win" ;;
+    Linux*)               $install_linux ;;
+    Darwin*)              $install_mac ;;
+    MINGW*|MSYS*|CYGWIN*) $install_win ;;
   esac
-  command -v "$cmd" &> /dev/null \
-    && echo "✅ $label installed" \
-    || { echo "❌ $label install failed. Search '$label install' for your OS."; return 1; }
+  if command -v "$cmd" 2>&1 | grep -q '^/'; then
+    echo "✅ $label installed"
+  else
+    echo "❌ $label install failed. Search '$label install' for your OS."
+    return 1
+  fi
 }
 
 # --- Uncomment what the project needs ---
@@ -259,7 +265,7 @@ check_and_install() {
 #   "GNU Make"
 
 # check_and_install "node" \
-#   "curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs" \
+#   "pkg_install nodejs" \
 #   "brew install node" \
 #   "winget install OpenJS.NodeJS.LTS" \
 #   "Node.js"
@@ -271,7 +277,7 @@ check_and_install() {
 #   "Python 3"
 
 # check_and_install "dotnet" \
-#   "curl -fsSL https://dot.net/v1/dotnet-install.sh | bash" \
+#   "pkg_install dotnet-sdk-8.0" \
 #   "brew install dotnet" \
 #   "winget install Microsoft.DotNet.SDK.8" \
 #   ".NET SDK"
