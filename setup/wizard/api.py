@@ -408,8 +408,11 @@ def api_llm_configure(body):
                     # Fallback: try with template repo owner
                     run(f"gh repo set-default {REPO_OWNER}/{REPO_NAME}", timeout=15)
 
-            # Set secrets with error checking
-            secret_provider = run(f'gh secret set LLM_PROVIDER --body "{provider}"', timeout=30)
+            # Set secrets with error checking.
+            # Use list form (shell=False) so the key value is passed verbatim —
+            # no shell expansion of $ or other special characters that would
+            # silently corrupt the stored secret.
+            secret_provider = run(['gh', 'secret', 'set', 'LLM_PROVIDER', '--body', provider], timeout=30)
             github_secrets_status["results"].append({
                 "secret": "LLM_PROVIDER",
                 "success": secret_provider["success"],
@@ -417,7 +420,7 @@ def api_llm_configure(body):
             })
 
             if provider != "copilot" and api_key:
-                secret_key = run(f'gh secret set LLM_API_KEY --body "{api_key}"', timeout=30)
+                secret_key = run(['gh', 'secret', 'set', 'LLM_API_KEY', '--body', api_key], timeout=30)
                 github_secrets_status["results"].append({
                     "secret": "LLM_API_KEY",
                     "success": secret_key["success"],
@@ -425,7 +428,7 @@ def api_llm_configure(body):
                 })
 
             if provider == "azure" and azure_endpoint:
-                secret_endpoint = run(f'gh secret set AZURE_OPENAI_ENDPOINT --body "{azure_endpoint}"', timeout=30)
+                secret_endpoint = run(['gh', 'secret', 'set', 'AZURE_OPENAI_ENDPOINT', '--body', azure_endpoint], timeout=30)
                 github_secrets_status["results"].append({
                     "secret": "AZURE_OPENAI_ENDPOINT",
                     "success": secret_endpoint["success"],
