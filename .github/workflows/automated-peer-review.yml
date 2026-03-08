@@ -421,7 +421,7 @@ jobs:
           if git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard | grep -v pr_details.json)" ]; then
             echo "No file changes produced by author revision."
           else
-            git add -A -- ':!pr_details.json'
+            git add -A
             git commit -m "[rework] Address peer review feedback"
 
             # Branch protection may block direct push to agent branches.
