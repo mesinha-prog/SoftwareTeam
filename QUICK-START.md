@@ -12,12 +12,12 @@ Welcome! This guide will help you set up the AI-assisted workflow.
 
 **Mac / Linux:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/meenusinha/BigProjPOC/template/agentic-workflow-gui/setup/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.sh | bash
 ```
 
 **Windows (PowerShell):**
 ```powershell
-irm https://raw.githubusercontent.com/meenusinha/BigProjPOC/template/agentic-workflow-gui/setup/setup.ps1 | iex
+irm https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.ps1 | iex
 ```
 
 The wizard will open in your browser and walk you through:
