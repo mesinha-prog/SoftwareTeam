@@ -259,9 +259,10 @@ jobs:
               const isAgentReview = agentReviewPattern.test(body);
 
               if (isAgentReview) {
-                if (body.includes('✅ **APPROVED**')) {
+                // Match with or without ** bold markers — LLMs don't always include them.
+                if (/✅\s+\*{0,2}APPROVED\*{0,2}/.test(body)) {
                   approvals++;
-                } else if (body.includes('🔴 **CHANGES REQUESTED**')) {
+                } else if (/🔴\s+\*{0,2}CHANGES REQUESTED\*{0,2}/.test(body)) {
                   changesRequested++;
                 }
               }
