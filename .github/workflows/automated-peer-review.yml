@@ -238,12 +238,22 @@ jobs:
           script: |
             const prNumber = ${{ inputs.pr_number || github.event.pull_request.number }};
 
-            // Get all review comments with "APPROVE" or "REQUEST_CHANGES" markers
-            const comments = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber
-            });
+            // Fetch both PR reviews (primary path: pulls.createReview) and
+            // issue comments (fallback path: issues.createComment when review API fails).
+            const [reviewsResp, commentsResp] = await Promise.all([
+              github.rest.pulls.listReviews({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                per_page: 100
+              }),
+              github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                per_page: 100
+              })
+            ]);
 
             // For each agent, only count their LATEST review decision.
             // This ensures that after a rework, a previous "CHANGES REQUESTED"
@@ -253,13 +263,29 @@ jobs:
             // Map: agentName -> latest decision ('approved' | 'changes_requested')
             const latestDecision = {};
 
-            // comments.data is oldest-first; iterate in order so later entries overwrite.
-            for (const comment of comments.data) {
-              const body = comment.body;
+            // Process PR reviews (sorted oldest-first so newer overwrites older).
+            const sortedReviews = [...reviewsResp.data].sort(
+              (a, b) => new Date(a.submitted_at) - new Date(b.submitted_at)
+            );
+            for (const review of sortedReviews) {
+              const body = review.body || '';
               const match = body.match(agentReviewPattern);
               if (!match) continue;
-
               const agentName = match[1].toLowerCase(); // e.g. "architect", "tester"
+              if (review.state === 'APPROVED') {
+                latestDecision[agentName] = 'approved';
+              } else if (review.state === 'CHANGES_REQUESTED') {
+                latestDecision[agentName] = 'changes_requested';
+              }
+            }
+
+            // Also check issue comments for the fallback path (when createReview failed).
+            // commentsResp.data is oldest-first; later entries overwrite earlier.
+            for (const comment of commentsResp.data) {
+              const body = comment.body || '';
+              const match = body.match(agentReviewPattern);
+              if (!match) continue;
+              const agentName = match[1].toLowerCase();
               if (/✅\s+\*{0,2}APPROVED\*{0,2}/.test(body)) {
                 latestDecision[agentName] = 'approved';
               } else if (/🔴\s+\*{0,2}CHANGES REQUESTED\*{0,2}/.test(body)) {
