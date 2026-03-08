@@ -76,13 +76,6 @@ def api_os_info():
 
 def api_prerequisites_status():
     """Check installation status of all prerequisites."""
-    # Check tkinter importability (works cross-platform)
-    try:
-        import importlib
-        tkinter_available = importlib.util.find_spec("tkinter") is not None
-    except Exception:
-        tkinter_available = False
-
     return {
         "git": {
             "installed": is_installed("git"),
@@ -92,25 +85,19 @@ def api_prerequisites_status():
             "installed": is_installed("gh"),
             "version": get_version("gh"),
         },
-        "python-tk": {
-            "installed": tkinter_available,
-            "version": "bundled" if tkinter_available else None,
-        },
     }
 
 
 def api_prerequisites_install(body):
     """Install a prerequisite tool.
 
-    body: {"tool": "git" | "gh" | "python-tk"}
+    body: {"tool": "git" | "gh"}
     """
     tool = body.get("tool")
     installer = _get_installer()
 
     if tool == "git":
         return installer.install_git()
-    elif tool == "python-tk":
-        return installer.install_tkinter()
     elif tool == "gh":
         return installer.install_gh()
     return {"success": False, "message": f"Unknown tool: {tool}"}
