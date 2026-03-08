@@ -394,25 +394,19 @@ def api_llm_configure(body):
         if auth["success"]:
             github_secrets_status["attempted"] = True
 
-            # Ensure gh repo set-default is configured before setting secrets.
-            # The fork-clone step sets it with cwd=dest, but that only persists
-            # inside that repo's .git/config. When running from the wizard's own
-            # directory, gh may not know which repo to target.
-            default_check = run("gh repo set-default --view", timeout=10)
-            if not default_check["success"] or not default_check["stdout"].strip():
-                # Auto-detect repo owner from authenticated user
-                whoami = run("gh api user --jq .login", timeout=15)
-                repo_owner = whoami["stdout"].strip() if whoami["success"] else REPO_OWNER
-                set_default = run(f"gh repo set-default {repo_owner}/{REPO_NAME}", timeout=15)
-                if not set_default["success"]:
-                    # Fallback: try with template repo owner
-                    run(f"gh repo set-default {REPO_OWNER}/{REPO_NAME}", timeout=15)
+            # Detect the authenticated GitHub user to build the target repo slug.
+            # Always pass --repo explicitly to gh secret set so the wizard works
+            # correctly from any directory (temp or otherwise), never relying on
+            # gh repo set-default which is context-dependent.
+            whoami = run("gh api user --jq .login", timeout=15)
+            repo_owner = whoami["stdout"].strip() if whoami["success"] else REPO_OWNER
+            target_repo = f"{repo_owner}/{REPO_NAME}"
 
             # Set secrets with error checking.
             # Use list form (shell=False) so the key value is passed verbatim —
             # no shell expansion of $ or other special characters that would
             # silently corrupt the stored secret.
-            secret_provider = run(['gh', 'secret', 'set', 'LLM_PROVIDER', '--body', provider], timeout=30)
+            secret_provider = run(['gh', 'secret', 'set', 'LLM_PROVIDER', '--body', provider, '--repo', target_repo], timeout=30)
             github_secrets_status["results"].append({
                 "secret": "LLM_PROVIDER",
                 "success": secret_provider["success"],
@@ -420,7 +414,7 @@ def api_llm_configure(body):
             })
 
             if provider != "copilot" and api_key:
-                secret_key = run(['gh', 'secret', 'set', 'LLM_API_KEY', '--body', api_key], timeout=30)
+                secret_key = run(['gh', 'secret', 'set', 'LLM_API_KEY', '--body', api_key, '--repo', target_repo], timeout=30)
                 github_secrets_status["results"].append({
                     "secret": "LLM_API_KEY",
                     "success": secret_key["success"],
@@ -428,7 +422,7 @@ def api_llm_configure(body):
                 })
 
             if provider == "azure" and azure_endpoint:
-                secret_endpoint = run(['gh', 'secret', 'set', 'AZURE_OPENAI_ENDPOINT', '--body', azure_endpoint], timeout=30)
+                secret_endpoint = run(['gh', 'secret', 'set', 'AZURE_OPENAI_ENDPOINT', '--body', azure_endpoint, '--repo', target_repo], timeout=30)
                 github_secrets_status["results"].append({
                     "secret": "AZURE_OPENAI_ENDPOINT",
                     "success": secret_endpoint["success"],
