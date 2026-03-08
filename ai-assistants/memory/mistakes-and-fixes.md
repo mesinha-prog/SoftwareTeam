@@ -27,7 +27,9 @@ What went wrong and how it was fixed, organized by agent. Maximum 10 entries per
 
 ## Product Owner
 
-<!-- No entries yet -->
+### 2026-03-08
+**Mistake**: Attempted to push agent branch without an upstream tracking branch.
+**Fix**: Push with `git push --set-upstream origin <branch>` to set the upstream.
 
 ---
 
