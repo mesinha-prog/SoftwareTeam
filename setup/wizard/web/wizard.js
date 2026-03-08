@@ -424,8 +424,8 @@ async function copyLocal() {
 
 // Screen 6: LLM Provider
 const PROVIDERS = [
-  { id: 'copilot', name: 'GitHub Copilot', cost: 'FREE*', needs_key: false,
-    note: 'Uses repository authentication. Requires Copilot Enterprise for automated reviews.' },
+  { id: 'copilot', name: 'GitHub Copilot', needs_key: false,
+    note: 'No API key needed. Uses repository authentication.' },
   { id: 'openai', name: 'OpenAI (GPT-4)', cost: '$$',
     url: 'https://platform.openai.com/api-keys',
     steps: ['Go to platform.openai.com/api-keys', 'Sign in or create account', 'Click "Create new secret key"', 'Copy the key (starts with sk-...)'] },
@@ -458,8 +458,7 @@ function selectProvider(id) {
   const detail = document.getElementById('provider-detail');
   if (provider.needs_key === false) {
     detail.innerHTML = `
-      <div class="alert alert-info">${provider.note}</div>
-      <p>No API key needed!</p>`;
+      <div class="alert alert-info">${provider.note}</div>`;
     document.getElementById('llm-api-key-group').style.display = 'none';
     document.getElementById('azure-endpoint-group').style.display = 'none';
     document.getElementById('llm-next').disabled = false;
