@@ -23,6 +23,10 @@ What went wrong and how it was fixed, organized by agent. Maximum 10 entries per
 ### 2026-03-08
 **Mistake**: Terminal got stuck in a dangling quote after a command, causing `dquote>` prompts and blocking subsequent commands.
 **Fix**: Use a fresh background terminal session for the next command (or close the quote with a standalone `"`), then continue in the clean session.
+
+### 2026-03-08
+**Mistake**: Committed IT setup changes on the task branch instead of the IT agent branch.
+**Fix**: Create the IT agent branch from the current commit and push that branch; avoid pushing the task branch directly.
 ---
 
 ## Product Owner
@@ -47,7 +51,9 @@ What went wrong and how it was fixed, organized by agent. Maximum 10 entries per
 
 ## Developer
 
-<!-- No entries yet -->
+### 2026-03-08
+**Mistake**: Test file accidentally included a patch marker line, breaking the test runner.
+**Fix**: Remove the stray marker and re-run tests.
 
 ---
 
