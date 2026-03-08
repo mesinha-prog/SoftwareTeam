@@ -370,6 +370,8 @@ scripts/
 - [ ] **Build verified** — scripts run successfully without errors
 - [ ] **Environment documented** — setup steps recorded in `project-management/operations/environment/`
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
+- [ ] Handover question asked and answered — user was explicitly asked "PR or hand over?" and user gave a direct answer to this question (not to
+  some other question)
 
 **Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 6.**
 
@@ -399,5 +401,7 @@ scripts/
 - [ ] **Release notes generated** from documentation
 - [ ] **All artifacts verified** — release package is complete and functional
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
-
+- [ ] Handover question asked and answered — user was explicitly asked "PR or hand over?" and user gave a direct answer to this question (not to
+  some other question)
+  
 **Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 9.**

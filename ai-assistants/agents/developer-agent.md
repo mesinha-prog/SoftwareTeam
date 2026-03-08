@@ -132,5 +132,7 @@ The Developer should understand the domain to make informed implementation decis
 - [ ] All code and tests committed to git
 - [ ] Branch pushed to remote
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
+- [ ] Handover question asked and answered — user was explicitly asked "PR or hand over?" and user gave a direct answer to this question (not to
+  some other question)
 
 **Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 7.**

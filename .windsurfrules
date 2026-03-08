@@ -32,6 +32,10 @@ CRITICAL: For ANY user task, follow these steps IN ORDER. Do NOT skip steps.
 
    When at any step, if you ask user for PR or 'handover to next agent', then user saying "hand over" or "yes" or "continue" or "skip" or anything similar in that one step does NOT authorize skipping confirmation in subsequent steps. It applies to the CURRENT handover only.
 
+   Confirmation of work ≠ handover permission.
+   If the user confirms that something works (e.g., "yes it works", "looks good", "nice"), that is NOT a handover response. The agent MUST still
+   ask the handover question explicitly before proceeding. Agent must never merge its work in the main task branch without explicit user permission to hand over to the next agent.
+
    The ONLY exception is when a preference is explicitly saved in
    [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md). If that file has no such entry, the
    agent MUST stop and ask in all the subsequent steps.
