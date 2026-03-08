@@ -401,6 +401,39 @@ After runtimes are installed, install project dependencies:
 - Run dependency installation (`npm install`, `pip install -r requirements.txt`, etc.)
 - Document installation steps in `project-management/operations/environment/`
 
+### External API Keys (MANDATORY — Do This Before Creating Scripts)
+
+**Before writing any run script**, scan the Architect's design documents and codebase for any external service API keys the app requires at runtime (e.g. NewsAPI, OpenWeatherMap, Stripe, Twilio, Google Maps, etc.).
+
+**For EVERY required external API key you find, you MUST:**
+
+1. **Tell the user exactly what service it is for and why the app needs it**, e.g.:
+   > "This app fetches news articles from NewsAPI. You need a free API key from https://newsapi.org/register. Without it the app will fail to load news."
+
+2. **Ask the user to provide the key**, e.g.:
+   > "Please paste your NewsAPI key so I can configure it before running the app:"
+
+3. **Wait for the user's answer** — do NOT proceed to running the app without it.
+
+4. **Write the key to a `.env` file** in the project root (create it if it doesn't exist), e.g.:
+   ```
+   NEWS_API_KEY=the-key-the-user-provided
+   ```
+
+5. **Ensure `.env` is in `.gitignore`** — never commit API keys to git.
+
+6. **Load the `.env` file in `run.sh`** so the key is available at runtime:
+   ```bash
+   # Load environment variables from .env if it exists
+   if [ -f .env ]; then
+     set -a; source .env; set +a
+   fi
+   ```
+
+**If the user cannot provide a key right now**, tell them the exact error they will see if they run the app without it, and what URL they need to visit to get the key.
+
+**Never silently skip this step.** An app that crashes at startup with a cryptic API error is a broken handoff.
+
 ### Create Project Scripts
 
 Create or update scripts in the `scripts/` folder:
@@ -415,12 +448,15 @@ scripts/
 
 - Customize scripts for the chosen technology stack
 - Ensure scripts work on all target platforms (Mac, Linux, Windows)
+- `run.sh` must source `.env` if it exists before starting the app (see above)
 
 ### BEFORE HANDING OFF (MANDATORY - DO NOT SKIP)
 
 - [ ] **All prerequisites installed** — language runtimes, package managers, build tools
 - [ ] **Project dependencies installed** — all packages from Architect's design
+- [ ] **External API keys collected** — asked user for every required external service key, written to `.env`, `.env` is in `.gitignore`
 - [ ] **Build scripts created/updated** in `scripts/` — build.sh, test.sh, run.sh, clean.sh
+- [ ] **`run.sh` sources `.env`** — so all API keys are loaded at runtime
 - [ ] **Build verified** — scripts run successfully without errors
 - [ ] **Environment documented** — setup steps recorded in `project-management/operations/environment/`
 - [ ] All scripts and configuration committed to git
