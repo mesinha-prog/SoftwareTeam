@@ -494,7 +494,7 @@ function extractSummary(reviewText) {
   return summary.trim();
 }
 
-// Resolve review threads for addressed issues
+// Resolve review threads for addressed issues using GitHub GraphQL API
 async function resolveReviewThreads(octokit, repo, prNumber, reviewText, previousReview) {
   if (!previousReview || !previousReview.comments || previousReview.comments.length === 0) {
     return;
@@ -509,24 +509,59 @@ async function resolveReviewThreads(octokit, repo, prNumber, reviewText, previou
 
   console.log(`  Found ${resolvedCount} issues marked as RESOLVED in re-review`);
 
-  // If all issues resolved, resolve all previous comment threads
-  if (resolvedCount > 0 || reviewText.includes('All previous concerns have been addressed')) {
-    for (const comment of previousReview.comments) {
-      try {
-        // Resolve the review comment thread
-        await octokit.rest.pulls.updateReviewComment({
-          owner,
-          repo: repoName,
-          comment_id: comment.id,
-          body: comment.body + '\n\n---\n✅ **RESOLVED** - Issue addressed in latest commits.'
-        });
+  const shouldResolveAll = resolvedCount > 0 || reviewText.includes('All previous concerns have been addressed');
+  if (!shouldResolveAll) return;
 
-        console.log(`  ✅ Resolved thread for comment ${comment.id} (${comment.path}:${comment.line})`);
-      } catch (error) {
-        console.error(`  ⚠️  Could not resolve thread ${comment.id}:`, error.message);
+  // Build a set of database IDs from the previous review's inline comments
+  const previousCommentIds = new Set(previousReview.comments.map(c => String(c.id)));
+
+  // Fetch all review threads via GraphQL to get their node IDs (needed for the mutation)
+  let threads = [];
+  try {
+    const result = await octokit.graphql(`
+      query GetReviewThreads($owner: String!, $repo: String!, $prNumber: Int!) {
+        repository(owner: $owner, name: $repo) {
+          pullRequest(number: $prNumber) {
+            reviewThreads(first: 50) {
+              nodes {
+                id
+                isResolved
+                comments(first: 1) {
+                  nodes { databaseId }
+                }
+              }
+            }
+          }
+        }
       }
+    `, { owner, repo: repoName, prNumber });
+    threads = result.repository.pullRequest.reviewThreads.nodes;
+  } catch (err) {
+    console.error(`  ⚠️  GraphQL query for review threads failed: ${err.message}`);
+  }
+
+  let resolved = 0;
+  for (const thread of threads) {
+    if (thread.isResolved) continue;
+    const firstId = thread.comments.nodes[0]?.databaseId;
+    if (!firstId || !previousCommentIds.has(String(firstId))) continue;
+
+    try {
+      await octokit.graphql(`
+        mutation ResolveThread($threadId: ID!) {
+          resolveReviewThread(input: { threadId: $threadId }) {
+            thread { id isResolved }
+          }
+        }
+      `, { threadId: thread.id });
+      resolved++;
+      console.log(`  ✅ Resolved thread ${thread.id}`);
+    } catch (err) {
+      console.error(`  ⚠️  Could not resolve thread ${thread.id}: ${err.message}`);
     }
   }
+
+  console.log(`  Resolved ${resolved} conversation thread(s).`);
 }
 
 // Parse review decision (APPROVED or CHANGES REQUESTED)
