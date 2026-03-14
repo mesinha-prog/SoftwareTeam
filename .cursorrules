@@ -145,7 +145,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 **MANDATORY HANDOVER step before moving on:**
 1. Present the tool verification results to the user
 2. Ask the user: "Tools are verified. Shall I hand over to Product Owner Agent for Requirements?"
-   Wait for the user's response — do NOT skip this step
+   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 3. Proceed to next step[Step 2](#step-2-product-owner--requirements) when user asks or confirms to do so.
 ---
 
@@ -171,7 +171,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 2. Present the user story to the user for confirmation
 3. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to Cost Analyst Agent for Cost Estimate?"
-   Wait for the user's response — do NOT skip this step
+   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 4. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 5. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
 6. Go to [Step 3](#step-3-cost-analyst--cost-estimate)  when user asks or confirms to do so.
@@ -199,7 +199,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 1. Commit and push your work
 2. Report the cost estimate to the user
 3. Ask the user: "The estimated cost is $X. Should I hand over to Architect Agent for Design, create a PR for review, or would you like to adjust the scope?"
-   Wait for the user's response — do NOT skip this step
+   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 4. If the user wants to adjust scope, go back to Step 2
 5. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 6. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
@@ -228,7 +228,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 1. Commit and push your work
 2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to IT Agent for Project Setup?"
-   Wait for the user's response — do NOT skip this step
+   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 3. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 4. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
 5. Go to [Step 5](#step-5-it-agent--project-setup)  when user asks or confirms to do so.
@@ -259,7 +259,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 1. Commit and push your work
 2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to Developer Agent for Implementation?"
-   Wait for the user's response — do NOT skip this step
+   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 3. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 4. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
 5. Go to [Step 6](#step-6-developer--implementation)  when user asks or confirms to do so.
@@ -290,7 +290,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
    - Windows: `scripts\run.ps1`
 3. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to Tester Agent for Validation?"
-   Wait for the user's response — do NOT skip this step
+   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 4. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 5. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
 6. Go to [Step 7](#step-7-tester--validation)  when user asks or confirms to do so.
@@ -321,7 +321,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
    - Windows: `scripts\test.ps1`
 3. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to IT Agent for Release?"
-   Wait for the user's response — do NOT skip this step
+   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 4. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 5. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
 6. Go to [Step 8](#step-8-it-agent--release)  when user asks or confirms to do so.
@@ -349,7 +349,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 1. Commit and push your work
 2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to Product Owner Agent for Acceptance?"
-   Wait for the user's response — do NOT skip this step
+   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 3. If user wants a PR: create it using `gh pr create --base master_{task_name}`
 4. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
 5. Go to [Step 9](#step-9-product-owner--acceptance)  when user asks or confirms to do so.
