@@ -17,7 +17,7 @@ from setup.wizard.utils.config import save_env_var, get_suggested_paths, browse_
 # Repository to fork/clone
 REPO_OWNER = "meenusinha"
 REPO_NAME = "SoftwareTeam"
-REPO_BRANCH = "template/agentic-workflow-gui"
+REPO_BRANCH = "main"
 
 
 def handle_api(path, body=None):

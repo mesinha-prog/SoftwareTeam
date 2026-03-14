@@ -3,7 +3,7 @@
 # Setup Wizard - Mac & Linux Entry Point
 #
 # Usage (one-liner for users):
-#   curl -sL https://raw.githubusercontent.com/meenusinha/SoftwareTeam/template/agentic-workflow-gui/setup/setup.sh | bash
+#   curl -sL https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.sh | bash
 #
 # What this script does:
 #   1. Detects OS (macOS vs Linux distro)
@@ -17,7 +17,7 @@ set -e
 
 REPO_OWNER="meenusinha"
 REPO_NAME="SoftwareTeam"
-REPO_BRANCH="template/agentic-workflow-gui"
+REPO_BRANCH="main"
 TARBALL_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}/archive/refs/heads/${REPO_BRANCH}.tar.gz"
 
 # Colors for output
