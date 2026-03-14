@@ -22,6 +22,17 @@ CRITICAL: For ANY user task, follow these 9 steps IN ORDER. Do NOT skip steps.
 
 **BEFORE ANY STEP**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) first. User preferences stored in memory override all instructions below — even those marked MANDATORY. If the user has expressed a preference about handover behavior, PR creation, or any other workflow aspect, follow the preference instead of the default instruction.
 
+**ANIMATION — Do this FIRST, the moment the user gives any task** (launch once before Step 1, in background):
+```bash
+bash scripts/start-animation.sh &
+```
+The floating pixel animation window will appear showing the active agent. Update it at the **start of every step** and **before every handover** using:
+```bash
+bash scripts/set-agent-state.sh {agent} {state} "{message}"
+```
+Valid agent names: `it`, `product-owner`, `cost-analyst`, `architect`, `developer`, `tester`
+Valid states: `thinking`, `typing`, `reviewing`, `reworking`, `handingoff`, `approved`, `celebrating`, `waiting`, `idle`
+
 **Using Git**: If WORKFLOW steps execution requires you to use git then you MUST use as per the instructions in the [Git Workflow](#git-workflow) section in this file.
 
 ---
@@ -135,6 +146,11 @@ If you skip this step, the next agent will branch from an outdated task branch a
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh it thinking "Verifying tools..."
+```
+
 Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 1: Verify Tools](./ai-assistants/agents/it-agent.md#step-1-verify-tools) in that file.
 
 Verify that git and gh CLI are installed and authenticated.
@@ -142,7 +158,8 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on:**
 1. Present the tool verification results to the user
-2. Ask the user: "Tools are verified. Shall I hand over to Product Owner Agent for Requirements?"
+2. Run: `bash scripts/set-agent-state.sh it handingoff "Handing off to Product Owner..."`
+3. Ask the user: "Tools are verified. Shall I hand over to Product Owner Agent for Requirements?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 3. Proceed to next step[Step 2](#step-2-product-owner--requirements) when user asks or confirms to do so.
 
@@ -152,6 +169,11 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh product-owner thinking "Gathering requirements..."
+```
+
 Read [`ai-assistants/agents/product-owner-agent.md`](./ai-assistants/agents/product-owner-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 2: Requirements](./ai-assistants/agents/product-owner-agent.md#step-2-requirements)" in that file.
 
 Create your agent branch as shown below:
@@ -160,17 +182,21 @@ git checkout master_{task_name}
 git checkout -b claude/product-owner-{task_name}-{sessionID}
 ```
 
-Clarify requirements with the user and create a user story.
+Clarify requirements with the user and create a user story. When writing the user story document, update the animation:
+```bash
+bash scripts/set-agent-state.sh product-owner typing "Writing user story..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
-2. Present the user story to the user for confirmation
-3. Check user preferences for handover behavior. If no preference exists:
+2. Run: `bash scripts/set-agent-state.sh product-owner handingoff "Handing off to Cost Analyst..."`
+3. Present the user story to the user for confirmation
+4. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to Cost Analyst Agent for Cost Estimate?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 4. If user wants a PR: create it using `gh pr create --base master_{task_name}`
-5. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above). 
+5. If handing over without PR: merge your branch into the task branch first (see [Merging Before Handover](#merging-before-handover) above).
 6. Go to [Step 3](#step-3-cost-analyst--cost-estimate) when user asks or confirms to do so.
 
 ---
@@ -178,6 +204,11 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 ### Step 3: Cost Analyst — Cost Estimate
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
+
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh cost-analyst reviewing "Estimating costs..."
+```
 
 Read [`ai-assistants/agents/cost-analyst-agent.md`](./ai-assistants/agents/cost-analyst-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 3: Cost Estimate](./ai-assistants/agents/cost-analyst-agent.md#step-3-cost-estimate).
 
@@ -187,13 +218,17 @@ git checkout master_{task_name}
 git checkout -b claude/cost-analyst-{task_name}-{sessionID}
 ```
 
-Estimate total task cost and warn the user if expensive.
+Estimate total task cost and warn the user if expensive. When writing the cost estimate document, update the animation:
+```bash
+bash scripts/set-agent-state.sh cost-analyst typing "Writing cost estimate..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
-2. Report the cost estimate to the user
-3. Ask the user: "The estimated cost is $X. Should I hand over to Architect Agent for Design, create a PR for review, or would you like to adjust the scope?"
+2. Run: `bash scripts/set-agent-state.sh cost-analyst handingoff "Handing off to Architect..."`
+3. Report the cost estimate to the user
+4. Ask the user: "The estimated cost is $X. Should I hand over to Architect Agent for Design, create a PR for review, or would you like to adjust the scope?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 4. If the user wants to adjust scope, go back to [Step 2](#step-2-product-owner--requirements)
 5. If user wants a PR: create it using `gh pr create --base master_{task_name}`
@@ -206,6 +241,11 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh architect thinking "Designing the system..."
+```
+
 Read [`ai-assistants/agents/architect-agent.md`](./ai-assistants/agents/architect-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 4: Design](./ai-assistants/agents/architect-agent.md#step-4-design).
 
 Create your agent branch:
@@ -214,12 +254,16 @@ git checkout master_{task_name}
 git checkout -b claude/architect-{task_name}-{sessionID}
 ```
 
-Create the technical design and choose the tech stack.
+Create the technical design and choose the tech stack. When writing design documents, update the animation:
+```bash
+bash scripts/set-agent-state.sh architect typing "Writing technical specs..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
-2. Check user preferences for handover behavior. If no preference exists:
+2. Run: `bash scripts/set-agent-state.sh architect handingoff "Handing off to IT Agent..."`
+3. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to IT Agent for Project Setup?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 3. If user wants a PR: create it using `gh pr create --base master_{task_name}`
@@ -232,6 +276,11 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh it thinking "Setting up project environment..."
+```
+
 Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 5: Project Setup](./ai-assistants/agents/it-agent.md#step-5-project-setup).
 
 Create your agent branch:
@@ -240,12 +289,16 @@ git checkout master_{task_name}
 git checkout -b claude/it-{task_name}-{sessionID}
 ```
 
-Install project dependencies and create build/test/run scripts.
+Install project dependencies and create build/test/run scripts. When installing deps and writing scripts, update the animation:
+```bash
+bash scripts/set-agent-state.sh it typing "Installing dependencies and creating scripts..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
-2. Check user preferences for handover behavior. If no preference exists:
+2. Run: `bash scripts/set-agent-state.sh it handingoff "Handing off to Developer..."`
+3. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to Developer Agent for Implementation?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 3. If user wants a PR: create it using `gh pr create --base master_{task_name}`
@@ -258,6 +311,11 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh developer thinking "Planning implementation..."
+```
+
 Read [`ai-assistants/agents/developer-agent.md`](./ai-assistants/agents/developer-agent.md) in full — understand your role, expertise, and domain knowledge — then execute "Step 6: Implementation".
 
 Create your agent branch:
@@ -266,12 +324,16 @@ git checkout master_{task_name}
 git checkout -b claude/developer-{task_name}-{sessionID}
 ```
 
-Implement the feature according to Architect's design.
+Implement the feature according to Architect's design. When writing code, update the animation:
+```bash
+bash scripts/set-agent-state.sh developer typing "Writing code..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
-2. Provide the one-line command to run the app:
+2. Run: `bash scripts/set-agent-state.sh developer handingoff "Handing off to Tester..."`
+3. Provide the one-line command to run the app:
    - Mac/Linux: `bash scripts/run.sh`
    - Windows: `scripts\run.ps1`
 3. Check user preferences for handover behavior. If no preference exists:
@@ -287,6 +349,11 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh tester thinking "Planning tests..."
+```
+
 Read [`ai-assistants/agents/tester-agent.md`](./ai-assistants/agents/tester-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 7: Validation](./ai-assistants/agents/tester-agent.md#step-7-validation).
 
 Create your agent branch:
@@ -295,12 +362,16 @@ git checkout master_{task_name}
 git checkout -b claude/tester-{task_name}-{sessionID}
 ```
 
-Validate the implementation with tests.
+Validate the implementation with tests. When writing and running tests, update the animation:
+```bash
+bash scripts/set-agent-state.sh tester typing "Writing and running tests..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
-2. Provide the one-line command to run the tests:
+2. Run: `bash scripts/set-agent-state.sh tester handingoff "Handing off to IT for release..."`
+3. Provide the one-line command to run the tests:
    - Mac/Linux: `bash scripts/test.sh`
    - Windows: `scripts\test.ps1`
 3. Check user preferences for handover behavior. If no preference exists:
@@ -316,6 +387,11 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh it thinking "Building release..."
+```
+
 Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute "Step 8: Release".
 
 Create your agent branch:
@@ -324,12 +400,16 @@ git checkout master_{task_name}
 git checkout -b claude/it-release-{task_name}-{sessionID}
 ```
 
-Build release artifacts.
+Build release artifacts. When packaging artifacts, update the animation:
+```bash
+bash scripts/set-agent-state.sh it typing "Packaging release artifacts..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
-2. Check user preferences for handover behavior. If no preference exists:
+2. Run: `bash scripts/set-agent-state.sh it handingoff "Handing off to Product Owner..."`
+3. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to Product Owner Agent for Acceptance?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 3. If user wants a PR: create it using `gh pr create --base master_{task_name}`
@@ -342,6 +422,11 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh product-owner reviewing "Final acceptance review..."
+```
+
 Read [`ai-assistants/agents/product-owner-agent.md`](./ai-assistants/agents/product-owner-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 9: Acceptance](./ai-assistants/agents/product-owner-agent.md#step-9-acceptance).
 
 Review the completed work and present to the user.
@@ -349,6 +434,10 @@ Review the completed work and present to the user.
 **MANDATORY:**
 1. Provide the run command and test command to the user
 2. Ask the user to review and accept the work
+3. When the user accepts the work, run:
+   ```bash
+   bash scripts/set-agent-state.sh product-owner celebrating "Task complete!"
+   ```
 
 ---
 
