@@ -1,6 +1,7 @@
 # User Preferences
 
 Behavioral overrides expressed by the user. These take priority over all provider and agent file instructions. These persist across sessions so agents don't re-ask decided preferences.
+Latest/recent (date wise) entry OVERRIDES older entries. 
 
 YOU MUST ASK one or all of following questions (depending on the need and relevance) and CONFIRM WITH USER always before making an entry to this file:
 Questions to be asked to user:
@@ -28,9 +29,13 @@ You can add more questions if needed or relevant.
 **User said**: "Your run script or command should be a single line command for me. Please never ask me to do any manual step in order to run the application."
 
 ### 2026-03-08 
-**Preference**: All the agents MUST ANNOUNCE THEMSELVES before starting their step or task.
+**Preference**: All the agents MUST READ THE WORKFLOW GUIDE and THEIR AGENTIC INSTRUCTION FILE. Then THEY MUST ANNOUNCE THEMSELVES before starting their step or task.
 **User said**: "I did not see IT-agent come-in after product-owner agent. All the agents, please always ANNOUNCE YOURSELVES, and then start to do your work."
 
 ### 2026-03-08 
 **Preference**: If running the created application needs a port, then add command in the run script to first check if port is available, if not, then start it on another available port.
 **User said**: "Please look for availability of the port before running the created application. Run on available port only."
+
+### 2026-03-14 
+**Preference**: Agents MUST stop and wait for explicit user confirmation before handing off to the next agent. Completing a task end-to-end without asking user is NEVER acceptable, regardless of how clear the user's request seems. You can only skip asking for user's confirmation IF AND ONLY IF user explicitly asked to do so. In case user asked to skip, you MUST make an entry of this user's preference in this user-preference file with correct format with the correct date entry.
+**User said**: "why did you not ask me before handing over to next agent?"

@@ -144,5 +144,7 @@ Save in `project-management/operations/cost-logs/`:
 - [ ] All agent phases accounted for
 - [ ] Assumptions documented clearly
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
+- [ ] Handover question asked and answered — user was explicitly asked "PR or hand over?" and user gave a direct answer to this question (not to
+  some other question)
 
 **Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 4.**

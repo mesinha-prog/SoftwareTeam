@@ -251,7 +251,45 @@ ${prDetails.body}
 **Changed Files** (${prDetails.files.length} files):
 ${prDetails.files.map(f => `- ${f.filename} (+${f.additions}/-${f.deletions})`).join('\n')}
 
-${previousReview ? `
+${previousReview && isRework ? `
+## 🔄 REWORK RE-REVIEW MODE
+
+The developer has reworked this PR to address your previous review. **This is the final review pass — no further rework will be requested.**
+
+**Your Previous Review** (${previousReview.state}):
+${previousReview.comments.length > 0 ? previousReview.comments.map((c, i) => `
+${i + 1}. **${c.path}:${c.line}**
+   ${c.body.replace(/\*\*🤖.*?\*\*\n\n/, '')}
+`).join('\n') : '(No inline comments in previous review)'}
+
+**Your Task**:
+1. Check each of your previous concerns against the new commits
+2. For each: note whether it was RESOLVED or still present (remarks only — no blocking)
+3. Add any new observations as inline remarks (optional, informational only)
+4. End with a mandatory approval — this is the final pass
+
+**Required Response Format**:
+
+### Rework Assessment
+[1-2 sentences: overall assessment of how well the rework addressed your concerns]
+
+### Previous Issues Status
+${previousReview.comments.map((c, i) => `Issue #${i + 1} (${c.path}:${c.line}):
+- Status: ✅ RESOLVED / ⚠️ PARTIALLY ADDRESSED / ❌ STILL PRESENT (remark only — not blocking)
+- Verification: [how you verified it / what remains]`).join('\n\n')}
+
+### Rework Remarks
+[Any new inline comments as observations on the rework — format same as below. Write "None" if no remarks.]
+
+INLINE_COMMENT: path/to/file.ext:123
+**[Severity: Minor]** [Observation title]
+[Brief note — informational, not blocking]
+
+### Decision
+[You MUST write this exact line — no other option:]
+✅ **APPROVED** - Rework reviewed. [1 sentence summary: e.g. "Critical issues were addressed." / "Some concerns remain but approval is granted for this pass."]
+
+` : previousReview ? `
 ## 🔄 RE-REVIEW MODE
 
 **IMPORTANT**: You have previously reviewed this PR and requested changes. The developer has pushed new commits to address your feedback.
@@ -291,9 +329,6 @@ Issue #1 (${previousReview.comments[0]?.path || 'file'}:${previousReview.comment
 
 Review this pull request thoroughly using your expertise and the following checklist:`}
 
-**Review Checklist**:
-${agent.checklist.map((item, i) => `${i + 1}. ${item}`).join('\n')}
-
 ## Code Changes
 
 ${prDetails.files.map(f => `
@@ -305,6 +340,17 @@ Changes: +${f.additions}/-${f.deletions}
 ${f.patch || '(Binary file or no patch available)'}
 \`\`\`
 `).join('\n')}
+
+${isRework ? `
+**IMPORTANT — REWORK REVIEW RULES**:
+- Follow the "Required Response Format" above exactly
+- Check every previous issue and mark it RESOLVED / PARTIALLY ADDRESSED / STILL PRESENT
+- Inline remarks are optional and informational only (Severity: Minor)
+- The Decision MUST be ✅ **APPROVED** — no other option is allowed
+- Your approval line MUST contain a brief summary sentence after the dash
+` : `
+**Review Checklist**:
+${agent.checklist.map((item, i) => `${i + 1}. ${item}`).join('\n')}
 
 ## Review Guidelines
 
@@ -357,14 +403,9 @@ INLINE_COMMENT: path/to/file.ext:123
 - [What was done well]
 
 ### Decision
-${isRework ? `
-**REWORK REVIEW — MANDATORY APPROVAL**
-This PR had changes requested and the author has already reworked it once. No further rework is allowed.
-You MUST output the APPROVED line below. You may still leave inline comments as remarks, but your decision MUST be approval.
-✅ **APPROVED** - Rework reviewed. Remarks left as inline comments where applicable.
-` : `[Write EXACTLY one of these two options:]
+[Write EXACTLY one of these two options:]
 ✅ **APPROVED** - This PR meets all quality standards for ${agent.role}.
-🔴 **CHANGES REQUESTED** - This PR requires changes before approval.`}
+🔴 **CHANGES REQUESTED** - This PR requires changes before approval.
 
 **IMPORTANT**:
 - Be strict but fair
@@ -377,7 +418,7 @@ You MUST output the APPROVED line below. You may still leave inline comments as 
 - **CRITICAL**: Provide MAXIMUM 10 inline comments - prioritize the most impactful issues
 - Focus ONLY on: Design, Functionality, Consistency, and Clean Code issues
 - Skip minor/trivial issues to stay within the 10-comment limit
-`;
+`}`;
 
   return prompt;
 }
@@ -470,23 +511,28 @@ function parseInlineComments(reviewText) {
   return comments;
 }
 
-// Extract summary from review text (everything before Inline Comments section)
+// Extract summary from review text (everything before the ### Decision section).
+// Works for both regular reviews (### Summary / ### Positive Aspects) and
+// rework reviews (### Rework Assessment / ### Previous Issues Status / ### Rework Remarks).
 function extractSummary(reviewText) {
-  // Get everything from Summary to before Inline Comments section
-  const summaryMatch = reviewText.match(/### Summary\s*([\s\S]*?)(?=### Inline Comments|### Positive Aspects|### Decision|$)/);
-  const positiveMatch = reviewText.match(/### Positive Aspects\s*([\s\S]*?)(?=### Decision|$)/);
+  const decisionIdx = reviewText.indexOf('### Decision');
   const decisionMatch = reviewText.match(/### Decision\s*([\s\S]*?)$/);
 
+  // Take everything before ### Decision, strip raw INLINE_COMMENT: blocks
+  // (those are rendered as inline comments separately)
+  const beforeDecision = decisionIdx >= 0
+    ? reviewText.substring(0, decisionIdx)
+    : reviewText;
+
+  const summaryText = beforeDecision
+    .replace(/^INLINE_COMMENT:.*$/mg, '')   // remove INLINE_COMMENT: header lines
+    .replace(/\n{3,}/g, '\n\n')             // collapse extra blank lines
+    .trim();
+
   let summary = '';
-
-  if (summaryMatch) {
-    summary += '### Summary\n' + summaryMatch[1].trim() + '\n\n';
+  if (summaryText) {
+    summary += summaryText + '\n\n';
   }
-
-  if (positiveMatch) {
-    summary += '### Positive Aspects\n' + positiveMatch[1].trim() + '\n\n';
-  }
-
   if (decisionMatch) {
     summary += '### Decision\n' + decisionMatch[1].trim();
   }
@@ -494,8 +540,9 @@ function extractSummary(reviewText) {
   return summary.trim();
 }
 
-// Resolve review threads for addressed issues
-async function resolveReviewThreads(octokit, repo, prNumber, reviewText, previousReview) {
+// Resolve review threads for addressed issues using GitHub GraphQL API.
+// isRework=true resolves ALL threads unconditionally (forced approval pass).
+async function resolveReviewThreads(octokit, repo, prNumber, reviewText, previousReview, isRework = false) {
   if (!previousReview || !previousReview.comments || previousReview.comments.length === 0) {
     return;
   }
@@ -509,24 +556,61 @@ async function resolveReviewThreads(octokit, repo, prNumber, reviewText, previou
 
   console.log(`  Found ${resolvedCount} issues marked as RESOLVED in re-review`);
 
-  // If all issues resolved, resolve all previous comment threads
-  if (resolvedCount > 0 || reviewText.includes('All previous concerns have been addressed')) {
-    for (const comment of previousReview.comments) {
-      try {
-        // Resolve the review comment thread
-        await octokit.rest.pulls.updateReviewComment({
-          owner,
-          repo: repoName,
-          comment_id: comment.id,
-          body: comment.body + '\n\n---\n✅ **RESOLVED** - Issue addressed in latest commits.'
-        });
+  // In rework mode the PR is force-approved, so resolve ALL threads regardless
+  // of whether they're marked RESOLVED, PARTIALLY ADDRESSED, or STILL PRESENT.
+  const shouldResolveAll = isRework || resolvedCount > 0 || reviewText.includes('All previous concerns have been addressed');
+  if (!shouldResolveAll) return;
 
-        console.log(`  ✅ Resolved thread for comment ${comment.id} (${comment.path}:${comment.line})`);
-      } catch (error) {
-        console.error(`  ⚠️  Could not resolve thread ${comment.id}:`, error.message);
+  // Build a set of database IDs from the previous review's inline comments
+  const previousCommentIds = new Set(previousReview.comments.map(c => String(c.id)));
+
+  // Fetch all review threads via GraphQL to get their node IDs (needed for the mutation)
+  let threads = [];
+  try {
+    const result = await octokit.graphql(`
+      query GetReviewThreads($owner: String!, $repo: String!, $prNumber: Int!) {
+        repository(owner: $owner, name: $repo) {
+          pullRequest(number: $prNumber) {
+            reviewThreads(first: 50) {
+              nodes {
+                id
+                isResolved
+                comments(first: 1) {
+                  nodes { databaseId }
+                }
+              }
+            }
+          }
+        }
       }
+    `, { owner, repo: repoName, prNumber });
+    threads = result.repository.pullRequest.reviewThreads.nodes;
+  } catch (err) {
+    console.error(`  ⚠️  GraphQL query for review threads failed: ${err.message}`);
+  }
+
+  let resolved = 0;
+  for (const thread of threads) {
+    if (thread.isResolved) continue;
+    const firstId = thread.comments.nodes[0]?.databaseId;
+    if (!firstId || !previousCommentIds.has(String(firstId))) continue;
+
+    try {
+      await octokit.graphql(`
+        mutation ResolveThread($threadId: ID!) {
+          resolveReviewThread(input: { threadId: $threadId }) {
+            thread { id isResolved }
+          }
+        }
+      `, { threadId: thread.id });
+      resolved++;
+      console.log(`  ✅ Resolved thread ${thread.id}`);
+    } catch (err) {
+      console.error(`  ⚠️  Could not resolve thread ${thread.id}: ${err.message}`);
     }
   }
+
+  console.log(`  Resolved ${resolved} conversation thread(s).`);
 }
 
 // Parse review decision (APPROVED or CHANGES REQUESTED)
@@ -689,7 +773,7 @@ async function main() {
   // Resolve threads if this is a re-review and issues were addressed
   if (previousReview && decision === 'APPROVE') {
     console.log('Resolving previous review threads...');
-    await resolveReviewThreads(octokit, repo, prNumber, reviewText, previousReview);
+    await resolveReviewThreads(octokit, repo, prNumber, reviewText, previousReview, isRework);
   }
 
   // Post review with inline comments

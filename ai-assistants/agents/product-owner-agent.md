@@ -148,6 +148,8 @@ Save in `project-management/tasks/backlog/{task-name}.md`:
 - [ ] **User story committed and pushed** to the task branch
 - [ ] **User has confirmed** the requirements are correct
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
+- [ ] Handover question asked and answered — user was explicitly asked "PR or hand over?" and user gave a direct answer to this question (not to
+  some other question)
 
 **Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 3.**
 
@@ -200,5 +202,7 @@ or if any changes are required.
 - [ ] **Acceptance decision documented** (accepted/rejected with reasons)
 - [ ] **If accepted**: final PR created to merge into the task branch
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
+- [ ] Handover question asked and answered — user was explicitly asked "PR or hand over?" and user gave a direct answer to this question (not to
+  some other question)
 
 **This is the final step in the workflow. The task is complete.**
