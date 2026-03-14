@@ -170,6 +170,10 @@ class AgentWindow:
         self.root.after(POLL_MS, self._schedule_poll)
 
     def _poll(self):
+        # Re-assert always-on-top every poll cycle so other windows can't bury it
+        self.root.attributes('-topmost', True)
+        self.root.lift()
+
         if self.demo:
             self._advance_demo()
             return

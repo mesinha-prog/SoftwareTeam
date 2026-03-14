@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Launch Agent Animation",
+      "type": "shell",
+      "command": "bash scripts/start-animation.sh",
+      "windows": {
+        "command": "powershell -WindowStyle Hidden -NonInteractive -File scripts\\Start-Animation.ps1"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "presentation": {
+        "reveal": "never",
+        "panel": "dedicated",
+        "close": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

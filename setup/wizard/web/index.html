@@ -440,6 +440,22 @@
 
   </div>
 
+  <!-- ===== Agent Animation Info Modal ===== -->
+  <div id="animation-modal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div class="modal-icon">🎮</div>
+      <h3 class="modal-title">Agent Animation Window</h3>
+      <p class="modal-subtitle" id="animation-modal-desc">A floating pixel-art window shows which AI agent is active and what it's doing in real time.</p>
+      <div class="modal-steps" id="animation-modal-steps">
+        <!-- Populated by JS based on selected tool -->
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-success modal-done-btn" onclick="closeAnimationModal(true)">&#128640; Got it, Launch!</button>
+        <button class="btn btn-secondary modal-skip-btn" onclick="closeAnimationModal(true)">Skip</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== GitHub Actions Modal ===== -->
   <div id="actions-modal" class="modal-overlay" style="display:none">
     <div class="modal-box">

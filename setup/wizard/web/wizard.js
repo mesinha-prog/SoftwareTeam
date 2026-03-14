@@ -628,12 +628,104 @@ async function installTool() {
   }
 }
 
+// Animation info per tool: { desc, steps[], note }
+const ANIMATION_INFO = {
+  'cursor': {
+    auto: true,
+    steps: [
+      'The animation window launches automatically when Cursor opens the project.',
+      'Cursor reads <code>.vscode/tasks.json</code> — no extra setup needed.',
+      'The window shows which agent is active and updates as agents hand off.',
+    ],
+  },
+  'windsurf': {
+    auto: true,
+    steps: [
+      'The animation window launches automatically when Windsurf opens the project.',
+      'Windsurf reads <code>.vscode/tasks.json</code> — no extra setup needed.',
+      'The window shows which agent is active and updates as agents hand off.',
+    ],
+  },
+  'vscode': {
+    auto: true,
+    steps: [
+      'The animation window launches automatically when VS Code opens the project.',
+      '<code>.vscode/settings.json</code> already has <code>task.allowAutomaticTasks: on</code> — no manual approval needed.',
+      'The window shows which agent is active and updates as agents hand off.',
+    ],
+  },
+  'copilot': {
+    auto: true,
+    steps: [
+      'The animation window launches automatically when VS Code opens the project.',
+      '<code>.vscode/settings.json</code> already has <code>task.allowAutomaticTasks: on</code> — no manual approval needed.',
+      'The window shows which agent is active and updates as agents hand off.',
+    ],
+  },
+  'claude-code': {
+    auto: false,
+    steps: [
+      'Claude Code is a terminal tool — VS Code auto-tasks don\'t apply.',
+      'The animation starts automatically when Claude executes <strong>Step 1 (IT Agent)</strong>.',
+      'Just give Claude a task in the terminal and the window will appear.',
+    ],
+    note: 'Make sure Python is available in your terminal for the animation to launch.',
+  },
+  'aider': {
+    auto: false,
+    steps: [
+      'Aider is a terminal tool — VS Code auto-tasks don\'t apply.',
+      'The animation starts automatically when Aider executes <strong>Step 1 (IT Agent)</strong>.',
+      'Run <code>aider</code> from the project folder and give it a task.',
+    ],
+    note: 'Make sure Python is available in your terminal for the animation to launch.',
+  },
+};
+
+function showAnimationModal() {
+  const info = ANIMATION_INFO[state.selectedTool];
+  if (!info) { _doLaunchTool(); return; }
+
+  const desc = document.getElementById('animation-modal-desc');
+  const stepsEl = document.getElementById('animation-modal-steps');
+
+  if (desc) {
+    desc.textContent = info.auto
+      ? 'A floating pixel-art window shows which AI agent is active — it launches automatically when you open the project.'
+      : 'A floating pixel-art window shows which AI agent is active — it starts when the AI executes its first step.';
+  }
+
+  if (stepsEl) {
+    const stepsHtml = info.steps.map(s => `
+      <div class="modal-step">
+        <span class="step-num">&#10003;</span>
+        <span>${s}</span>
+      </div>`).join('');
+    const noteHtml = info.note
+      ? `<p style="margin-top:12px; font-size:13px; color:var(--text-muted)">💡 ${info.note}</p>`
+      : '';
+    stepsEl.innerHTML = stepsHtml + noteHtml;
+  }
+
+  const m = document.getElementById('animation-modal');
+  if (m) m.style.display = 'flex';
+}
+
+function closeAnimationModal(andLaunch) {
+  const m = document.getElementById('animation-modal');
+  if (m) m.style.display = 'none';
+  if (andLaunch) _doLaunchTool();
+}
+
 async function launchTool() {
   if (!state.selectedTool || !state.projectPath) {
     showAlert('tool-alerts', 'No project path set. Please go back and set up your project.', 'warning');
     return;
   }
+  showAnimationModal();
+}
 
+async function _doLaunchTool() {
   const btn = document.getElementById('launch-tool-btn');
   btn.textContent = 'Launching...';
   btn.disabled = true;
