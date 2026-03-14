@@ -101,7 +101,7 @@ When starting the FIRST task in a NEW project, you MUST update "## Domain Expert
 Create the task branch (as instructed below), then your agent branch (your workflow guide specifies the exact agent branch prefix):
 
 ```bash
-git checkout template/agentic-workflow-gui
+git checkout main
 git checkout -b master_{task_name}
 git push -u origin master_{task_name}
 # Then create your agent branch from the task branch
@@ -143,7 +143,7 @@ Save in `project-management/tasks/backlog/{task-name}.md`:
 
 - [ ] **User story created** in `project-management/tasks/backlog/{task-name}.md`
 - [ ] **Acceptance criteria** clearly defined in the user story
-- [ ] **Task branch created** from `template/agentic-workflow-gui`: `master_{task_name}`
+- [ ] **Task branch created** from `main`: `master_{task_name}`
 - [ ] **Agent branch created** from the task branch (as directed by your workflow guide)
 - [ ] **User story committed and pushed** to the task branch
 - [ ] **User has confirmed** the requirements are correct

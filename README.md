@@ -8,12 +8,12 @@ Paste ONE command to launch a browser-based setup wizard that handles everything
 
 **Mac / Linux:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/meenusinha/BigProjPOC/template/agentic-workflow-gui/setup/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/meenusinha/BigProjPOC/main/setup/setup.sh | bash
 ```
 
 **Windows (PowerShell):**
 ```powershell
-irm https://raw.githubusercontent.com/meenusinha/BigProjPOC/template/agentic-workflow-gui/setup/setup.ps1 | iex
+irm https://raw.githubusercontent.com/meenusinha/BigProjPOC/main/setup/setup.ps1 | iex
 ```
 
 **New here? See [QUICK-START.md](QUICK-START.md)** for a simple 5-step guide.

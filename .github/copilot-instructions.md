@@ -60,14 +60,14 @@ Please understand the below  section about git workflow completely before starti
 
 All work in this project is organized using Git branches at two levels:
 
-1. **Task level:** When the user gives you new work — whether it is building a new project, adding a feature, fixing a bug, or any other request — a task branch `master_{task_name}` is created from the `template/agentic-workflow-gui` branch in the user's forked repository. This task branch is the single destination for all work related to that request.
+1. **Task level:** When the user gives you new work — whether it is building a new project, adding a feature, fixing a bug, or any other request — a task branch `master_{task_name}` is created from the `main` branch in the user's forked repository. This task branch is the single destination for all work related to that request.
 
 2. **Agent level:** As each agent (Architect, Developer, Tester, etc.) works on their part of the task, they create their own branch from the task branch. When an agent completes their work, their branch is merged back into the task branch — either directly or through a pull request if the user requests a review.
 
 ### How branches work
 
 ```
-template/agentic-workflow-gui                              ← template branch (never modified directly)
+main                              ← template branch (never modified directly)
   └── master_{task_name}                                   ← task branch (one per user request)
         ├── copilot/product-owner-{task_name}-{sessionID}     ← Product Owner's work → merges back to task branch
         ├── copilot/cost-analyst-{task_name}-{sessionID}      ← Cost Analyst's work → merges back to task branch
@@ -80,13 +80,13 @@ template/agentic-workflow-gui                              ← template branch (
 
 ### Branch naming
 
-- **Template branch:** `template/agentic-workflow-gui`
+- **Template branch:** `main`
 - **Task branch:** `master_{task_name}` (e.g., `master_login-page`)
 - **Agent branch:** `copilot/{agent}-{task_name}-{sessionID}` (e.g., `copilot/developer-login-page-abc123`)
 
 ### Rules
 
-- Every new user request gets a new task branch created from `template/agentic-workflow-gui`
+- Every new user request gets a new task branch created from `main`
 - All agent branches are created from the task branch, not from the template branch
 - All pull requests target the task branch `master_{task_name}`, never main or master
 - Iterations, fixes, and improvements related to the same user request all stay within the same task branch
@@ -94,7 +94,7 @@ template/agentic-workflow-gui                              ← template branch (
 ### Creating a Task Branch (Product Owner does this at Step 2)
 
 ```bash
-git checkout template/agentic-workflow-gui
+git checkout main
 git checkout -b master_{task_name}
 git push -u origin master_{task_name}
 ```
