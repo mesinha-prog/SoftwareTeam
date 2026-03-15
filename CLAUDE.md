@@ -34,6 +34,8 @@ bash scripts/set-agent-state.sh {agent} {state} "{message}"
 Valid agent names: `it`, `product-owner`, `cost-analyst`, `architect`, `developer`, `tester`
 Valid states: `thinking`, `typing`, `reviewing`, `reworking`, `handingoff`, `approved`, `celebrating`, `waiting`, `idle`
 
+⚡ **TERMINAL EXECUTION REQUIRED**: Every `bash scripts/...` command in this document MUST be run via your terminal/shell tool. Do NOT write these commands as text or code blocks in your response — use your tool to actually execute them. If you display the command instead of running it, the animation will not work.
+
 **Using Git**: If WORKFLOW steps execution requires you to use git then you MUST use as per the instructions in the [Git Workflow](#git-workflow) section in this file.
 
 ---
@@ -147,7 +149,7 @@ If you skip this step, the next agent will branch from an outdated task branch a
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-**ANIMATION — Run both commands now** (launch window if not running, then set state):
+**ANIMATION — Run both commands now via terminal tool** (do NOT write as text — actually execute them):
 ```bash
 bash scripts/start-animation.sh &
 bash scripts/set-agent-state.sh it thinking "Verifying tools..."
@@ -172,7 +174,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-**ANIMATION**: Update the animation window now:
+**ANIMATION** — run via terminal tool now (do NOT write as text):
 ```bash
 bash scripts/set-agent-state.sh product-owner thinking "Gathering requirements..."
 ```
@@ -211,7 +213,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-**ANIMATION**: Update the animation window now:
+**ANIMATION** — run via terminal tool now (do NOT write as text):
 ```bash
 bash scripts/set-agent-state.sh cost-analyst reviewing "Estimating costs..."
 ```
@@ -250,7 +252,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-**ANIMATION**: Update the animation window now:
+**ANIMATION** — run via terminal tool now (do NOT write as text):
 ```bash
 bash scripts/set-agent-state.sh architect thinking "Designing the system..."
 ```
@@ -288,7 +290,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-**ANIMATION**: Update the animation window now:
+**ANIMATION** — run via terminal tool now (do NOT write as text):
 ```bash
 bash scripts/set-agent-state.sh it thinking "Setting up project environment..."
 ```
@@ -326,7 +328,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-**ANIMATION**: Update the animation window now:
+**ANIMATION** — run via terminal tool now (do NOT write as text):
 ```bash
 bash scripts/set-agent-state.sh developer thinking "Planning implementation..."
 ```
@@ -367,7 +369,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-**ANIMATION**: Update the animation window now:
+**ANIMATION** — run via terminal tool now (do NOT write as text):
 ```bash
 bash scripts/set-agent-state.sh tester thinking "Planning tests..."
 ```
@@ -408,7 +410,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-**ANIMATION**: Update the animation window now:
+**ANIMATION** — run via terminal tool now (do NOT write as text):
 ```bash
 bash scripts/set-agent-state.sh it thinking "Building release..."
 ```
@@ -446,7 +448,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-**ANIMATION**: Update the animation window now:
+**ANIMATION** — run via terminal tool now (do NOT write as text):
 ```bash
 bash scripts/set-agent-state.sh product-owner reviewing "Final acceptance review..."
 ```
