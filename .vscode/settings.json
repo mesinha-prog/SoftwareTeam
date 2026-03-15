@@ -9,5 +9,36 @@
     {
       "file": ".github/copilot-instructions.md"
     }
+  ],
+
+  "// Copilot terminal auto-approve": "Animation scripts never need permission — Mac/Linux (bash) and Windows (PowerShell)",
+  "chat.tools.terminal.autoApprove": {
+    "/^bash scripts\\/set-agent-state\\.sh/": true,
+    "/^bash scripts\\/start-animation\\.sh/": true,
+    "/^python -m agent_animation/": true,
+    "/^python3 -m agent_animation/": true,
+    "/^python -c [\"']from agent_animation/": true,
+    "/^python3 -c [\"']from agent_animation/": true,
+    "/^nohup python -m agent_animation/": true,
+    "/^(powershell|pwsh).*Set-AgentState\\.ps1/i": true,
+    "/^(powershell|pwsh).*Start-Animation\\.ps1/i": true,
+    "/^\\.\\\\scripts\\\\Set-AgentState\\.ps1/i": true,
+    "/^\\.\\\\scripts\\\\Start-Animation\\.ps1/i": true
+  },
+
+  "// Windsurf terminal auto-approve": "Animation scripts auto-execute without approval dialogs — Mac/Linux and Windows",
+  "windsurf.cascadeCommandsAllowList": [
+    "bash scripts/set-agent-state.sh",
+    "bash scripts/start-animation.sh",
+    "python -m agent_animation",
+    "python3 -m agent_animation",
+    "python -c \"from agent_animation",
+    "python -c 'from agent_animation",
+    "python3 -c \"from agent_animation",
+    "nohup python -m agent_animation",
+    "powershell",
+    "pwsh",
+    ".\\scripts\\Set-AgentState.ps1",
+    ".\\scripts\\Start-Animation.ps1"
   ]
 }

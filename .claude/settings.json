@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash scripts/set-agent-state.sh *)",
+      "Bash(bash scripts/start-animation.sh*)",
+      "Bash(python -m agent_animation.*)",
+      "Bash(python -c \"from agent_animation*\")",
+      "Bash(python3 -m agent_animation.*)",
+      "Bash(python3 -c \"from agent_animation*\")",
+      "Bash(powershell*scripts\\\\Set-AgentState.ps1*)",
+      "Bash(powershell*scripts\\\\Start-Animation.ps1*)",
+      "Bash(pwsh*scripts\\\\Set-AgentState.ps1*)",
+      "Bash(pwsh*scripts\\\\Start-Animation.ps1*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/hook-pre-tool-use.py"
+          }
+        ]
+      }
+    ]
+  }
+}

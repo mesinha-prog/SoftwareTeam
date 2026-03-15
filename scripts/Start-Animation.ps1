@@ -9,6 +9,10 @@ if ($existing) { exit 0 }
 
 $root = Split-Path $PSScriptRoot
 Set-Location $root
+
+# Reset to initial IT agent state so stale state from a previous session is cleared
+python -c "from agent_animation.state import write; write('it', 'idle', 'Ready...')" 2>$null
+
 $extraArgs = if ($Demo) { @('--demo') } else { @() }
 
 # Start as independent process so it survives the calling shell exiting

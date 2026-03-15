@@ -14,10 +14,13 @@ State file format (JSON):
 
 import json
 import os
+import tempfile
 import time
 from pathlib import Path
 
-STATE_FILE = Path(os.environ.get('AGENT_STATE_FILE', '/tmp/agent-state.json'))
+# Use the system temp dir so this works on Windows (%TEMP%), macOS and Linux (/tmp)
+_default_state_file = str(Path(tempfile.gettempdir()) / 'agent-state.json')
+STATE_FILE = Path(os.environ.get('AGENT_STATE_FILE', _default_state_file))
 
 _DEFAULT_STATE = {
     'agent':   'developer',
