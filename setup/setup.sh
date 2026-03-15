@@ -215,7 +215,7 @@ download_repo() {
         exit 1
     fi
 
-    # The tarball extracts to a directory like SoftwareTeam-template-agentic-workflow-gui/
+    # The tarball extracts to a directory like SoftwareTeam-main/
     # Find the extracted directory
     REPO_DIR=$(find "$TEMP_DIR" -maxdepth 1 -type d -name "${REPO_NAME}*" | head -1)
 

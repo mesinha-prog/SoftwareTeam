@@ -209,7 +209,7 @@ You describe what you want
 
 For each task, the AI uses this branch structure:
 
-- **Base branch**: `template/agentic-workflow` (template for all tasks)
+- **Base branch**: `main` (template for all tasks)
 - **Task branch**: `master_{task_name}` (e.g., `master_login-feature`)
   - Created once per task
   - All agents work from this branch
@@ -221,7 +221,7 @@ For each task, the AI uses this branch structure:
 
 **Example**: For "Create a login page" task:
 ```
-template/agentic-workflow
+main
   └─→ master_login-page (Product Owner creates this)
         ├─→ {llm-name}/architect-login-page-abc123 (Architect's work)
         ├─→ {llm-name}/developer-login-page-abc123 (Developer's work)

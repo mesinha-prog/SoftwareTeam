@@ -99,7 +99,7 @@ If the repository owner has enabled "Template repository":
 
 ```bash
 # Clone the template branch
-git clone -b template/agentic-workflow https://github.com/REPO-OWNER/REPO-NAME.git my-project
+git clone -b main https://github.com/REPO-OWNER/REPO-NAME.git my-project
 cd my-project
 
 # Remove original remote and set up your own
