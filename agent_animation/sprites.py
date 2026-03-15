@@ -118,37 +118,37 @@ def _make_typing(body: str, body_light: str, hair: str = 'H') -> list[list[str]]
 
 AGENTS = {
     'developer': {
-        'color':  '#3A9944',
+        'color':  '#5DBB6A',   # bright green — visible on dark bg
         'label':  'Developer',
-        'idle':   [_make('G', 'g', 'h'), _make('G', 'g', 'h')],  # 2 identical; bob handled by y-offset
+        'idle':   [_make('G', 'g', 'h'), _make('G', 'g', 'h')],
         'typing': [_make('G', 'g', 'h'), _make_typing('G', 'g', 'h')],
     },
     'architect': {
-        'color':  '#CC7700',
+        'color':  '#EE9922',   # bright orange
         'label':  'Architect',
         'idle':   [_make('O', 'o', 'D'), _make('O', 'o', 'D')],
         'typing': [_make('O', 'o', 'D'), _make_typing('O', 'o', 'D')],
     },
     'tester': {
-        'color':  '#5588CC',
+        'color':  '#88AAEE',   # bright blue
         'label':  'Tester',
         'idle':   [_make('T', 't', 'H'), _make('T', 't', 'H')],
         'typing': [_make('T', 't', 'H'), _make_typing('T', 't', 'H')],
     },
     'product-owner': {
-        'color':  '#224499',
+        'color':  '#6688DD',   # bright navy (was #224499 — too dark)
         'label':  'Product Owner',
         'idle':   [_make('B', 'c', 'h'), _make('B', 'c', 'h')],
         'typing': [_make('B', 'c', 'h'), _make_typing('B', 'c', 'h')],
     },
     'it': {
-        'color':  '#772299',
+        'color':  '#BB55DD',   # bright purple
         'label':  'IT Agent',
         'idle':   [_make('P', 'p', 'E'), _make('P', 'p', 'E')],
         'typing': [_make('P', 'p', 'E'), _make_typing('P', 'p', 'E')],
     },
     'cost-analyst': {
-        'color':  '#AA8800',
+        'color':  '#DDBB33',   # bright gold
         'label':  'Cost Analyst',
         'idle':   [_make('Y', 'y', 'D'), _make('Y', 'y', 'D')],
         'typing': [_make('Y', 'y', 'D'), _make_typing('Y', 'y', 'D')],
