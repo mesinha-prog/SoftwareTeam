@@ -67,11 +67,13 @@ class AgentWindow:
         self.root  = root
         self.demo  = demo
 
-        self._agent_name = 'developer'
-        self._state_name = 'idle'
-        self._message    = ''
-        self._frame_idx  = 0
-        self._start_time = time.time()
+        self._agent_name        = 'developer'
+        self._state_name        = 'idle'
+        self._message           = ''
+        self._frame_idx         = 0
+        self._start_time        = time.time()
+        self._state_change_time = time.time()
+        self._state_file_ts     = time.time()   # timestamp from the state file itself
 
         self._demo_agents = list(AGENTS.keys())
         self._demo_states = list(STATE_CONFIG.keys())
@@ -154,10 +156,12 @@ class AgentWindow:
             return
         s = read_state()
         if s['agent'] != self._agent_name or s['state'] != self._state_name:
-            self._frame_idx = 0
-        self._agent_name = s['agent']
-        self._state_name = s['state']
-        self._message    = s['message']
+            self._frame_idx         = 0
+            self._state_change_time = time.time()
+        self._agent_name    = s['agent']
+        self._state_name    = s['state']
+        self._message       = s['message']
+        self._state_file_ts = s['ts'] if s['ts'] else self._state_file_ts
 
     def _advance_demo(self):
         now = time.time()
@@ -182,9 +186,35 @@ class AgentWindow:
         interval = max(80, int(1000 / sc['fps']))
         self.root.after(interval, self._schedule_frame)
 
+    # Seconds in 'handingoff' before auto-transitioning display to 'waiting'
+    _HANDOFF_WAIT_SECS = 4.0
+    # Seconds since the last state-file write before assuming agent is waiting
+    # for user input (question, clarification, permission prompt, etc.)
+    _QUIET_WAIT_SECS   = 25.0
+    # States that are naturally terminal — don't auto-transition these
+    _NO_AUTO_WAIT = {'idle', 'waiting', 'celebrating', 'approved'}
+
     def _render_frame(self):
         agent_cfg = get_agent(self._agent_name)
-        state_cfg = get_state_config(self._state_name)
+
+        display_state = self._state_name
+        display_msg   = self._message
+        now           = time.time()
+        quiet_secs    = now - self._state_file_ts
+
+        if display_state not in self._NO_AUTO_WAIT:
+            if (display_state == 'handingoff' and
+                    now - self._state_change_time > self._HANDOFF_WAIT_SECS):
+                # Agent asked handover question — quickly flip to waiting
+                display_state = 'waiting'
+                display_msg   = 'Waiting for user input, please respond...'
+            elif quiet_secs > self._QUIET_WAIT_SECS:
+                # Agent went quiet — asked a question, needs permission, or is
+                # waiting for clarification from the user
+                display_state = 'waiting'
+                display_msg   = 'Waiting for user input, please respond...'
+
+        state_cfg = get_state_config(display_state)
 
         frames = agent_cfg[state_cfg['frames_key']]
         frame  = frames[self._frame_idx % len(frames)]
@@ -267,13 +297,13 @@ class AgentWindow:
 
         # ------ 6. Update UI labels ------
         border_color = state_cfg['border_color']
-        if self._state_name == 'celebrating':
+        if display_state == 'celebrating':
             border_color = random.choice(
                 ['#FF5566', '#55FF88', '#5566FF', '#FFEE44', '#FF55FF'])
         self._border_frame.configure(bg=border_color)
 
         bubble_bg = state_cfg['bubble_color']
-        message   = self._message or _default_message(self._state_name)
+        message   = display_msg or _default_message(display_state)
         self._bubble_frame.configure(bg=bubble_bg)
         self._bubble_icon.configure(bg=bubble_bg, text=icon)
         self._bubble_lbl.configure(bg=bubble_bg, fg='#111133', text=message)
@@ -446,7 +476,7 @@ def _default_message(state: str) -> str:
         'changes_requested': 'Changes needed 🔴',
         'handingoff':        'Handing off…',
         'celebrating':       'Merged! 🎉',
-        'waiting':           'Waiting for you…',
+        'waiting':           'Waiting for user input, please respond...',
     }.get(state, '')
 
 
