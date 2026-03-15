@@ -21,18 +21,18 @@ PALETTE = {
     'H': '#553311',   # dark brown hair
     'D': '#AA7733',   # light brown hair
     'h': '#221100',   # very dark hair
-    'G': '#3A9944',   # green    (Developer)
-    'g': '#5DBB6A',   # green light
-    'O': '#CC7700',   # orange   (Architect)
-    'o': '#EE9922',   # orange light
-    'T': '#5588CC',   # blue     (Tester)
-    't': '#88AADD',   # blue light
-    'B': '#224499',   # navy     (Product Owner)
-    'c': '#4466BB',   # navy light
-    'P': '#772299',   # purple   (IT Agent)
-    'p': '#9944BB',   # purple light
-    'Y': '#AA8800',   # gold     (Cost Analyst)
-    'y': '#CCAA22',   # gold light
+    'G': '#44CC55',   # green    (Developer)
+    'g': '#77EE88',   # green light
+    'O': '#FF9900',   # orange   (Architect)
+    'o': '#FFBB44',   # orange light
+    'T': '#4488EE',   # blue     (Tester)
+    't': '#88BBFF',   # blue light
+    'B': '#3366EE',   # navy     (Product Owner)
+    'c': '#6688FF',   # navy light
+    'P': '#BB33DD',   # purple   (IT Agent)
+    'p': '#DD66FF',   # purple light
+    'Y': '#DDAA00',   # gold     (Cost Analyst)
+    'y': '#FFCC33',   # gold light
 }
 
 # ---------------------------------------------------------------------------
@@ -121,37 +121,37 @@ AGENTS = {
         'color':  '#5DBB6A',   # bright green — visible on dark bg
         'label':  'Developer',
         'idle':   [_make('G', 'g', 'h'), _make('G', 'g', 'h')],
-        'typing': [_make('G', 'g', 'h'), _make_typing('G', 'g', 'h')],
+        'typing': [_make('G', 'g', 'h'), _make('G', 'g', 'h')],
     },
     'architect': {
         'color':  '#EE9922',   # bright orange
         'label':  'Architect',
         'idle':   [_make('O', 'o', 'D'), _make('O', 'o', 'D')],
-        'typing': [_make('O', 'o', 'D'), _make_typing('O', 'o', 'D')],
+        'typing': [_make('O', 'o', 'D'), _make('O', 'o', 'D')],
     },
     'tester': {
         'color':  '#88AAEE',   # bright blue
         'label':  'Tester',
         'idle':   [_make('T', 't', 'H'), _make('T', 't', 'H')],
-        'typing': [_make('T', 't', 'H'), _make_typing('T', 't', 'H')],
+        'typing': [_make('T', 't', 'H'), _make('T', 't', 'H')],
     },
     'product-owner': {
         'color':  '#6688DD',   # bright navy (was #224499 — too dark)
         'label':  'Product Owner',
         'idle':   [_make('B', 'c', 'h'), _make('B', 'c', 'h')],
-        'typing': [_make('B', 'c', 'h'), _make_typing('B', 'c', 'h')],
+        'typing': [_make('B', 'c', 'h'), _make('B', 'c', 'h')],
     },
     'it': {
         'color':  '#BB55DD',   # bright purple
         'label':  'IT Agent',
         'idle':   [_make('P', 'p', 'E'), _make('P', 'p', 'E')],
-        'typing': [_make('P', 'p', 'E'), _make_typing('P', 'p', 'E')],
+        'typing': [_make('P', 'p', 'E'), _make('P', 'p', 'E')],
     },
     'cost-analyst': {
         'color':  '#DDBB33',   # bright gold
         'label':  'Cost Analyst',
         'idle':   [_make('Y', 'y', 'D'), _make('Y', 'y', 'D')],
-        'typing': [_make('Y', 'y', 'D'), _make_typing('Y', 'y', 'D')],
+        'typing': [_make('Y', 'y', 'D'), _make('Y', 'y', 'D')],
     },
 }
 
