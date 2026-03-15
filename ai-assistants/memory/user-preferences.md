@@ -39,3 +39,7 @@ You can add more questions if needed or relevant.
 ### 2026-03-14 
 **Preference**: Agents MUST stop and wait for explicit user confirmation before handing off to the next agent. Completing a task end-to-end without asking user is NEVER acceptable, regardless of how clear the user's request seems. You can only skip asking for user's confirmation IF AND ONLY IF user explicitly asked to do so. In case user asked to skip, you MUST make an entry of this user's preference in this user-preference file with correct format with the correct date entry.
 **User said**: "why did you not ask me before handing over to next agent?"
+
+### 2026-03-15
+**Preference**: Always enforce all steps and requirements in your workflow instruction file, including running mandatory scripts, prompting for user permission, and never skipping any workflow step. If direct execution is not possible, always notify the user and request explicit permission. Always run the agentic animation mentioned in your workflow instructios.
+**User said**: "Why did you not run the agentic animation as explicitly mandated in your workflow guide instructions?"
