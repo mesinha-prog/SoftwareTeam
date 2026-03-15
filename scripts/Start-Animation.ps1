@@ -3,7 +3,7 @@
 param([switch]$Demo)
 
 # Only one instance at a time
-$existing = Get-WmiObject Win32_Process -Filter "Name='python.exe'" |
+$existing = Get-CimInstance Win32_Process -Filter "Name='python.exe'" |
     Where-Object { $_.CommandLine -like '*agent_animation.agent_window*' }
 if ($existing) { exit 0 }
 
