@@ -247,10 +247,10 @@ Each agent has a specific role, expertise, and checklist that the LLM API uses f
 ### 5.1 Repository Secrets
 
 **Required**:
-- `ANTHROPIC_API_KEY`: Your Anthropic/Claude API key
+- `LLM_API_KEY`: Your Anthropic/Claude API key
   - Obtain from: https://console.anthropic.com/
   - Add to: Repository Settings → Secrets and variables → Actions → New repository secret
-  - Name: `ANTHROPIC_API_KEY`
+  - Name: `LLM_API_KEY`
   - Value: `sk-ant-...`
 
 **Automatic**:

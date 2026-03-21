@@ -27,7 +27,7 @@ This directory contains configuration for your LLM (Large Language Model) provid
 {
   "provider": { "name": "anthropic" },
   "model": { "name": "claude-sonnet-4-20250514" },
-  "api": { "key_env_var": "ANTHROPIC_API_KEY" }
+  "api": { "key_env_var": "LLM_API_KEY" }
 }
 ```
 
@@ -36,8 +36,8 @@ This directory contains configuration for your LLM (Large Language Model) provid
 npm install -g @anthropic-ai/claude-code
 
 # Linux/macOS:
-export ANTHROPIC_API_KEY="your-key"
-# Windows (PowerShell): $env:ANTHROPIC_API_KEY = "your-key"
+export LLM_API_KEY="your-key"
+# Windows (PowerShell): $env:LLM_API_KEY = "your-key"
 
 claude
 ```
@@ -47,7 +47,7 @@ claude
 {
   "provider": { "name": "openai" },
   "model": { "name": "gpt-4o" },
-  "api": { "key_env_var": "OPENAI_API_KEY" }
+  "api": { "key_env_var": "LLM_API_KEY" }
 }
 ```
 
@@ -61,7 +61,7 @@ claude
   "provider": { "name": "azure" },
   "model": { "name": "gpt-4" },
   "api": {
-    "key_env_var": "AZURE_OPENAI_API_KEY",
+    "key_env_var": "LLM_API_KEY",
     "base_url": "https://your-resource.openai.azure.com"
   }
 }
@@ -72,7 +72,7 @@ claude
 {
   "provider": { "name": "google" },
   "model": { "name": "gemini-1.5-pro" },
-  "api": { "key_env_var": "GOOGLE_API_KEY" }
+  "api": { "key_env_var": "LLM_API_KEY" }
 }
 ```
 
@@ -108,7 +108,7 @@ aider --model ollama/llama3
   "provider": { "name": "custom" },
   "model": { "name": "your-model" },
   "api": {
-    "key_env_var": "CUSTOM_API_KEY",
+    "key_env_var": "LLM_API_KEY",
     "base_url": "https://your-api-endpoint.com/v1"
   }
 }
@@ -132,30 +132,23 @@ The agentic workflow works with various AI coding assistants:
 
 Store API keys as environment variables, never in files:
 
+
+> **Note:** If you are only using an AI tool (Claude CLI, Cursor, Copilot, etc.), you do **not** need to set any 'extra' provider specific environment variables for using this software. Just follow your tool’s own setup instructions for authentication. The llm api key environment variable below is only required if you want to use this repo's automation/scripts (such as automated PR reviews or direct API calls from scripts).
+
+
 **Linux/macOS** (add to `~/.bashrc` or `~/.zshrc`):
 ```bash
-export ANTHROPIC_API_KEY="sk-ant-..."
-export OPENAI_API_KEY="sk-..."
-export AZURE_OPENAI_API_KEY="..."
-export AZURE_OPENAI_ENDPOINT="https://..."
-export GOOGLE_API_KEY="..."
-export LLM_API_KEY="..."   # Generic (used by this template)
+export LLM_API_KEY="your-api-key-here"   # Only LLM_API_KEY is required for this template's automation/scripts
 ```
 
 **Windows (PowerShell)** (add to `$PROFILE` for persistence):
 ```powershell
-$env:ANTHROPIC_API_KEY = "sk-ant-..."
-$env:OPENAI_API_KEY = "sk-..."
-$env:AZURE_OPENAI_API_KEY = "..."
-$env:AZURE_OPENAI_ENDPOINT = "https://..."
-$env:GOOGLE_API_KEY = "..."
-$env:LLM_API_KEY = "..."   # Generic (used by this template)
+$env:LLM_API_KEY = "your-api-key-here"   # Only LLM_API_KEY is required for this template's automation/scripts
 ```
 
 **Windows (CMD):**
 ```cmd
-set ANTHROPIC_API_KEY=sk-ant-...
-set OPENAI_API_KEY=sk-...
+set LLM_API_KEY=your-api-key-here   # Only LLM_API_KEY is required for this repo's automation/scripts
 ```
 
 ## Security

@@ -3,8 +3,6 @@
 
 - **Give it a task** - Your agentic team plans, designs, and builds it automatically in your AI tool.
 
-- **Provider-agnostic approach** for AI-assisted multi-agent development workflows.
-
 - **Predefined AI agents** work out-of-the-box, or **use this as a template** to customize your workflows.
 [Pixel based animation makes AI collaboration feel alive and tangible.]
 
