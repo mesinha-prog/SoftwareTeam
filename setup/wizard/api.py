@@ -462,6 +462,10 @@ def api_github_fork_clone(body):
     force = body.get("force", False)
     dest = os.path.join(dest_parent, project_name)
 
+    # Validate prerequisites BEFORE touching the filesystem
+    if not is_installed("gh"):
+        return {"success": False, "message": "GitHub CLI is required for fork & clone"}
+
     if os.path.exists(dest):
         if not force:
             return {
@@ -471,9 +475,6 @@ def api_github_fork_clone(body):
                 "message": f"A project folder already exists at: {dest}",
             }
         shutil.rmtree(dest)
-
-    if not is_installed("gh"):
-        return {"success": False, "message": "GitHub CLI is required for fork & clone"}
 
     # Detect the authenticated GitHub username
     whoami = run("gh api user --jq .login", timeout=15)
@@ -744,6 +745,16 @@ def api_local_copy(body):
     force = body.get("force", False)
     dest = os.path.join(dest_parent, project_name)
 
+    # Validate prerequisites BEFORE touching the filesystem
+    # The repo was already extracted to a temp dir by setup.sh
+    # That path is passed as an env var
+    source = os.environ.get("WIZARD_REPO_PATH", "")
+    if not source or not os.path.isdir(source):
+        return {
+            "success": False,
+            "message": "Source repo not found. Please re-run the setup script.",
+        }
+
     if os.path.exists(dest):
         if not force:
             return {
@@ -753,15 +764,6 @@ def api_local_copy(body):
                 "message": f"A project folder already exists at: {dest}",
             }
         shutil.rmtree(dest)
-
-    # The repo was already extracted to a temp dir by setup.sh
-    # That path is passed as an env var
-    source = os.environ.get("WIZARD_REPO_PATH", "")
-    if not source or not os.path.isdir(source):
-        return {
-            "success": False,
-            "message": "Source repo not found. Please re-run the setup script.",
-        }
 
     try:
         # 1. Copy base project (skip .git and setup/ dirs)
