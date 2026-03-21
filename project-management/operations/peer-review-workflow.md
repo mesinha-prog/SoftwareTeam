@@ -1,7 +1,7 @@
 # Peer Review Workflow
 
 **Document**: Automated Peer Review Workflow
-**Project**: BigProjPOC
+**Project**: SoftwareTeam
 **Owner**: IT Agent
 **Date**: 2026-01-20
 **Version**: 1.0
@@ -23,7 +23,7 @@
 
 ## 1. Overview
 
-The BigProjPOC project uses an **automated peer review workflow** to ensure quality and knowledge sharing across all agent contributions. Every pull request is automatically assigned to the appropriate peer reviewers based on the originating agent.
+The SoftwareTeam project uses an **automated peer review workflow** to ensure quality and knowledge sharing across all agent contributions. Every pull request is automatically assigned to the appropriate peer reviewers based on the originating agent.
 
 ### Key Benefits
 

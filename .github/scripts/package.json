@@ -1,7 +1,7 @@
 {
   "name": "automated-peer-review",
   "version": "1.0.0",
-  "description": "Automated multi-agent peer review for BigProjPOC",
+  "description": "Automated multi-agent peer review for SoftwareTeam",
   "main": "automated-review.js",
   "scripts": {
     "review": "node automated-review.js"

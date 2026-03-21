@@ -1,7 +1,7 @@
 # Automated Multi-Agent Peer Review System
 
 **Document**: Automated Multi-Agent Peer Review
-**Project**: BigProjPOC
+**Project**: SoftwareTeam
 **Owner**: IT Agent
 **Date**: 2026-01-20
 **Version**: 1.0
@@ -49,12 +49,41 @@ The **Automated Multi-Agent Peer Review System** uses LLM APIs (OpenAI, Anthropi
 ---
 
 ## 2. How It Works
+> **Note:** Manual trigger is recommended to save LLM API costs, especially for large or frequent PRs. Automatic triggers may result in higher API usage and costs.
+#### How to Change PR review Trigger Configuration from automtatic to manual
+
+By default, the workflow runs automatically on PRs to <code>master_*</code> branches and can also be triggered manually from the Actions tab.
+
+**To make the workflow manual trigger only (disable automatic runs on PR events):**
+1. Open <code>.github/workflows/automated-peer-review.yml</code> in your repository.
+2. Remove or comment out the <code>pull_request</code> section under <code>on:</code> so only <code>workflow_dispatch</code> remains, like this:
+   ```yaml
+   on:
+     workflow_dispatch:
+       inputs:
+         pr_number:
+           description: 'PR number to review'
+           required: true
+           type: number
+   ```
+3. Commit and push the change. Now, the workflow will only run when manually triggered from the Actions tab.
 
 ### Workflow Triggers
 
-The automated review workflow uses **manual trigger only** (`workflow_dispatch`) to save LLM API costs. It does NOT run automatically when a PR is created or updated.
+The automated review workflow runs automatically when a pull request is opened, updated (new commits pushed), or reopened targeting any branch matching <code>master_*</code>. It can also be triggered manually from the Actions tab ("Run workflow") by entering a PR number. Both methods are supported by default.
 
-**To trigger the review:**
+### Review and Rework Cycle
+
+1. When a PR is opened or updated, agents review it in sequence.
+2. If any agent requests changes, the developer must push new commits to address the feedback.
+3. On new commits, the workflow is triggered again, and agents who previously requested changes enter **re-review mode**: they check only if their previous concerns are addressed.
+4. If all concerns are resolved, agents approve the PR. If not, they request changes again.
+5. **Critical: Only one rework cycle is allowed per agent (to save API cost).**
+  - If an agent requests changes again after the first rework, the next re-review is a **MANDATORY APPROVAL**: the agent must approve, even if some issues remain, and can only leave remarks as inline comments. This prevents endless rework cycles, controls API usage, and ensures the process always terminates.
+6. This cycle repeats for each agent until all required approvals are obtained and the PR can be merged.
+7. If the PR is closed (without merging), the review cycle ends and no further reviews are performed.
+
+**To trigger the review manually:**
 1. Go to the **Actions** tab in your GitHub repository
 2. Click **"Automated Multi-Agent Peer Review"** in the left sidebar
 3. Click the **"Run workflow"** button (top right)

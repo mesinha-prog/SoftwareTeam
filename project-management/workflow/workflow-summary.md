@@ -43,7 +43,7 @@ Example assignment:
 
 Example PR creation:
 ```bash
-export GH_TOKEN=$(cat /home/user/BigProjPOC/.github_token)
+export GH_TOKEN=$(cat /home/user/SoftwareTeam/.github_token)
 
 gh pr create --base master --head agent/developer-rtdcs-NxeRq \
   --title "Implement temperature monitoring" \

@@ -7,7 +7,7 @@
 1. Go to https://platform.openai.com/api-keys
 2. Create an account (or sign in)
 3. Click **Create new secret key**
-4. Give it a name (e.g., "BigProjPOC")
+4. Give it a name (e.g., "SoftwareTeam")
 5. Copy the key (starts with `sk-...`)
 
 ## Step 2: Set Environment Variables

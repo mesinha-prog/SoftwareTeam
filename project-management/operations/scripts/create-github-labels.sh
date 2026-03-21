@@ -14,7 +14,7 @@
 
 set -e
 
-REPO="meenusinha/BigProjPOC"
+REPO="meenusinha/SoftwareTeam"
 
 echo "Creating GitHub labels for peer review workflow..."
 echo "Repository: ${REPO}"

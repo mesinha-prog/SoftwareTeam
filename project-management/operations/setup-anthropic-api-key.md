@@ -1,7 +1,7 @@
 # Setup Guide: Anthropic API Key for Automated Reviews
 
 **Document**: Anthropic API Key Setup
-**Project**: BigProjPOC
+**Project**: SoftwareTeam
 **Owner**: IT Agent
 **Date**: 2026-01-20
 
@@ -29,7 +29,7 @@ The automated multi-agent peer review system uses **Claude API** (Anthropic) to 
 
 4. **Create New API Key**:
    - Click "Create Key" or "New API Key"
-   - Give it a name: `BigProjPOC-GitHub-Actions`
+   - Give it a name: `SoftwareTeam-GitHub-Actions`
    - Copy the key (starts with `sk-ant-...`)
    - **⚠️ IMPORTANT**: Save this key securely - you won't be able to see it again!
 
@@ -301,7 +301,7 @@ Claude API charges based on tokens used:
 - **Documentation**: https://docs.github.com/en/actions
 - **Community Forum**: https://github.community/
 
-### BigProjPOC Support
+### SoftwareTeam Support
 
 - **Documentation**: `docs/it/automated-multi-agent-review.md`
 - **Issues**: https://github.com/{owner}/{repo}/issues

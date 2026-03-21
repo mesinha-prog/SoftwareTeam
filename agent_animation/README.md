@@ -134,9 +134,9 @@ The window polls `/tmp/agent-state.json` every 800ms (configurable via
 
 ---
 
-## Integration with BigProjPOC workflow
+## Integration with SoftwareTeam workflow
 
-Add state updates to your agent scripts in `BigProjPOC`:
+Add state updates to your agent scripts in `SoftwareTeam`:
 
 ```bash
 # In copilot-instructions / agent step scripts:

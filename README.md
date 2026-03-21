@@ -1,28 +1,13 @@
-# Agentic Workflow Template
+# SoftwareTeam – Your AI Software Team #
 
-A **provider-agnostic template** for AI-assisted multi-agent development workflows.
+**Give it a task. Your AI team plans, designs, and builds it in your AI tool.**
 
-## One-Command Setup (Recommended)
+**"A **provider-agnostic approach** for AI-assisted multi-agent development workflows."**
 
-Paste ONE command to launch a browser-based setup wizard that handles everything:
+**“Predefined AI agents work out-of-the-box, or use this as a template to customize your workflows.”**
 
-**Mac / Linux:**
-```bash
-curl -fsSL https://raw.githubusercontent.com/meenusinha/BigProjPOC/main/setup/setup.sh | bash
-```
 
-**Windows (PowerShell):**
-```powershell
-irm https://raw.githubusercontent.com/meenusinha/BigProjPOC/main/setup/setup.ps1 | iex
-```
-
-**New here? See [QUICK-START.md](QUICK-START.md)** for a simple 5-step guide.
-
----
-
-## What is this?
-
-A structured approach to software development using specialized AI agents:
+## SoftwareTeam comes with predefined AI agents that mimic the workflow of a real software team: ##
 
 - **Product Owner**: Customer-facing, gathers requirements, creates user stories
 - **Architect**: Designs systems and creates technical specifications
@@ -31,11 +16,70 @@ A structured approach to software development using specialized AI agents:
 - **IT**: Manages infrastructure and releases
 - **Cost Analyst**: Estimates token costs, warns before expensive operations
 
-## Who is this for?
+**Your team collaborates automatically. You simply open your AI tool (Claude, Cursor, vscode-Copilot, etc.) and provide your task prompt.**
 
+---
+
+
+## Platform supported
+Works on **Mac, Windows, and Linux**, and supports multiple [AI providers](#works-with-any-ai).
+
+---
+
+
+## Quick Demo
+[]
+
+---
+
+
+## One-Command Setup (Recommended)
+
+Open your terminal / command line, paste ONE command, and press Enter.
+This will launch a browser-based setup wizard that installs and configures everything.
+
+**Mac / Linux:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.ps1 | iex
+```
+
+**New here? See [QUICK-START.md](QUICK-START.md)** for a simple 5-step guide.
+
+---
+
+
+## What is this? 
+**A structured approach to software development using specialized AI agents — designed to work with your preferred tools and workflows.**
+
+## Who is this for?
 - **Non-programmers** who want AI help building software
-- **Teams** wanting structured AI-assisted workflows
+- **Deveopers** wanting structured AI-assisted workflows
 - **Projects** needing consistent development processes
+
+## How You Can Use It?
+**SoftwareTeam** supports different ways of working:
+
+**1. With Git** (recommended for developers)
+- **Full workflow** with branches, PRs, and collaboration
+- Ideal for teams and structured projects
+
+**2. Without Git** (simple usage)
+- **Just use your AI tool** and generate outputs
+- No version control required
+- **Great for beginners and quick experiments**
+
+**3. Optional: Use as a Template**
+- Start with the predefined AI workflow.
+- **Modify agent** roles, workflows, or directories via markdown.
+- Ideal for creating **custom AI-assisted software development pipelines**.
+
+---
+
 
 ## Works With Any AI
 
@@ -50,12 +94,14 @@ A structured approach to software development using specialized AI agents:
 
 ---
 
+
 ## Quick Start (For Developers)
 
+git clone <repo-url> my-project
 ```bash
 # 1. Clone this template
-git clone <repo-url> my-project
-cd my-project
+git clone https://github.com/meenusinha/SoftwareTeam.git my-softwareTeam
+cd my-softwareTeam
 
 # 2. Set up your AI provider
 cp ai-assistants/provider-setup/config.template.json ai-assistants/provider-setup/config.json
