@@ -474,7 +474,10 @@ def api_github_fork_clone(body):
                 "dest": dest,
                 "message": f"A project folder already exists at: {dest}",
             }
-        shutil.rmtree(dest)
+        try:
+            shutil.rmtree(dest)
+        except Exception as e:
+            return {"success": False, "message": f"Could not remove existing folder: {e}"}
 
     # Detect the authenticated GitHub username
     whoami = run("gh api user --jq .login", timeout=15)
@@ -763,7 +766,10 @@ def api_local_copy(body):
                 "dest": dest,
                 "message": f"A project folder already exists at: {dest}",
             }
-        shutil.rmtree(dest)
+        try:
+            shutil.rmtree(dest)
+        except Exception as e:
+            return {"success": False, "message": f"Could not remove existing folder: {e}"}
 
     try:
         # 1. Copy base project (skip .git and setup/ dirs)
