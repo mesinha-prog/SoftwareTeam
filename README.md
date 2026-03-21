@@ -82,6 +82,8 @@ irm https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.p
 
 
 ## Works With Any AI
+<details>
+<summary>Click to expand AI tool options</summary>
 
 | Provider | Models | Recommended Tools |
 |----------|--------|-------------------|
@@ -218,12 +220,15 @@ git push -u origin main
 2. Product Owner clarifies requirements, creates user story
 3. Cost Analyst estimates resource usage (warns if expensive)
 4. Architect enriches with technical specifications
-5. Product Owner assigns tasks to agents
-6. Agents work independently in git worktrees
-7. Peer review ensures quality
-8. PRs are created for your review
+5. IT agent takes care of necessary infrastructure and tools' installations
+6. Product Owner assigns tasks to agents
+7. Agents work independently in git worktrees
+8. Peer review ensures quality
+9. PRs, reviewed by agents, are presented for your final merge action
 
 ## Setup by Provider
+<details>
+<summary>Click to expand AI tool setup options</summary>
 
 ### Anthropic Claude (Recommended)
 ```bash
