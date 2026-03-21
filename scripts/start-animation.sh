@@ -23,6 +23,20 @@ if [ -z "$DISPLAY" ]; then
   fi
 fi
 
+# Ensure tkinter is available (on Fedora/RHEL it's a separate package)
+if ! python -c "import tkinter" 2>/dev/null; then
+  echo "[agent_animation] tkinter not found — installing..." >>/tmp/agent-animation.log
+  if command -v dnf >/dev/null 2>&1; then
+    sudo dnf install -y python3-tkinter >>/tmp/agent-animation.log 2>&1 || true
+  elif command -v apt-get >/dev/null 2>&1; then
+    sudo apt-get install -y python3-tk >>/tmp/agent-animation.log 2>&1 || true
+  elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman -S --noconfirm tk >>/tmp/agent-animation.log 2>&1 || true
+  elif command -v zypper >/dev/null 2>&1; then
+    sudo zypper install -y python3-tk >>/tmp/agent-animation.log 2>&1 || true
+  fi
+fi
+
 # Reset to initial IT agent state so stale state from a previous session is cleared
 python -c "from agent_animation.state import write; write('it', 'idle', 'Ready...')" 2>/dev/null || true
 

@@ -21,14 +21,23 @@ Native OS window decorations provide minimize / maximize / close.
 Press Escape to close.
 """
 
-import tkinter as tk
+import glob
+import os
+import sys
+
+try:
+    import tkinter as tk
+except ImportError:
+    print('[agent_animation] tkinter is not installed.', file=sys.stderr)
+    print('  Fedora/RHEL:  sudo dnf install python3-tkinter', file=sys.stderr)
+    print('  Ubuntu/Debian: sudo apt install python3-tk', file=sys.stderr)
+    print('  Arch:          sudo pacman -S tk', file=sys.stderr)
+    sys.exit(1)
+
 import math
 import time
 import random
 import argparse
-import glob
-import os
-import sys
 
 from .sprites import PALETTE, CELL, get_agent, get_state_config, AGENTS, STATE_CONFIG
 from .state import read as read_state
