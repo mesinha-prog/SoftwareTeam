@@ -498,7 +498,16 @@ def api_github_fork_clone(body):
     # Fork the repo (if not already forked)
     run(f"gh repo fork {REPO_OWNER}/{REPO_NAME} --clone=false", timeout=60)
 
-    # Strategy 1: Clone from user's fork
+    # Always sync the user's fork with the upstream template before cloning.
+    # Without this, an out-of-date fork produces a clone that is missing recent
+    # commits — which is exactly the "old files" symptom after a replace.
+    if gh_user and gh_user.lower() != REPO_OWNER.lower():
+        run(
+            f"gh repo sync {gh_user}/{REPO_NAME} --branch {REPO_BRANCH} --source {REPO_OWNER}/{REPO_NAME}",
+            timeout=60,
+        )
+
+    # Strategy 1: Clone from user's fork (now synced)
     clone_result = {"success": False, "stderr": ""}
     if gh_user:
         clone_result = run(
@@ -506,15 +515,7 @@ def api_github_fork_clone(body):
             timeout=120,
         )
 
-    # Strategy 2: If branch missing in fork, sync fork then retry
-    if not clone_result["success"] and gh_user:
-        run(f"gh repo sync {gh_user}/{REPO_NAME} --branch {REPO_BRANCH} --source {REPO_OWNER}/{REPO_NAME}", timeout=60)
-        clone_result = run(
-            f'gh repo clone {gh_user}/{REPO_NAME} "{dest}" -- --branch {REPO_BRANCH}',
-            timeout=120,
-        )
-
-    # Strategy 3: Clone from original repo, then fix remotes to point to fork
+    # Strategy 2: Clone from original repo (user is the owner, or fork clone failed)
     if not clone_result["success"]:
         clone_result = run(
             f'gh repo clone {REPO_OWNER}/{REPO_NAME} "{dest}" -- --branch {REPO_BRANCH}',
