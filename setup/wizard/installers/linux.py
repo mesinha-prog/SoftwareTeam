@@ -113,51 +113,138 @@ def _pkg_install(packages):
     }
 
 
+def _install_via_terminal(tool_name, cmd, check_binary):
+    """Open a terminal so the user can run a sudo command natively.
+
+    Launches the command in a visible terminal window so sudo prompts
+    appear in a trusted terminal rather than the browser wizard.
+    When the terminal closes, returns a result based on whether the
+    binary is now detectable.
+    """
+    if not cmd:
+        return {"success": False, "message": f"No install command available for {tool_name}"}
+
+    launched = False
+    for terminal, flag in [
+        ("gnome-terminal", "--"),
+        ("xterm", "-e"),
+        ("konsole", "-e"),
+        ("xfce4-terminal", "-e"),
+        ("lxterminal", "-e"),
+        ("mate-terminal", "-e"),
+    ]:
+        if is_installed(terminal):
+            full_cmd = f"{terminal} {flag} bash -c \"{cmd}; echo; echo 'Done. Close this window.'; read -p 'Press Enter to close...' _\""
+            result = run(full_cmd, timeout=5)
+            launched = True
+            break
+
+    if not launched:
+        return {
+            "success": False,
+            "message": (
+                f"No terminal emulator found to run the install command.\n"
+                f"Please run this manually:\n{cmd}"
+            ),
+            "error_log": cmd,
+        }
+
+    return {
+        "success": True,
+        "message": (
+            f"A terminal window has opened to install {tool_name}. "
+            "Please complete the installation there, then click 'Check Again'."
+        ),
+        "terminal_launched": True,
+    }
+
+
 def install_git():
-    """Install git on Linux."""
+    """Install git on Linux.
+
+    Tries the package manager via a terminal window so any sudo password
+    prompt appears in a trusted terminal, not the browser wizard.
+    """
     if is_installed("git"):
         return {"success": True, "message": "Git is already installed", "skipped": True}
 
-    return _pkg_install({
-        "apt": "git",
-        "dnf": "git",
-        "pacman": "git",
-        "zypper": "git",
-    })
+    info = get_os_info()
+    mgr = info.get("pkg_manager")
+    s = _sudo()
+    cmds = {
+        "apt":    f"{s}apt update && {s}apt install -y git",
+        "dnf":    f"{s}dnf install -y git",
+        "yum":    f"{s}yum install -y git",
+        "pacman": f"{s}pacman -S --noconfirm git",
+        "zypper": f"{s}zypper install -y git",
+    }
+    cmd = cmds.get(mgr, "")
+
+    # If already root or passwordless sudo, run directly (no terminal needed)
+    if s == "":
+        return _pkg_install({"apt": "git", "dnf": "git", "pacman": "git", "zypper": "git"})
+
+    return _install_via_terminal("git", cmd, "git")
 
 
 def install_gh():
-    """Install GitHub CLI on Linux."""
+    """Install GitHub CLI on Linux using a standalone binary — no sudo required.
+
+    Downloads the latest release tarball from GitHub and installs to ~/.local/bin.
+    Falls back to package manager (needs sudo) only if the download fails.
+    """
     if is_installed("gh"):
         return {"success": True, "message": "GitHub CLI is already installed", "skipped": True}
 
+    # --- Standalone binary install (no sudo) ---
+    result = run(
+        'curl -fsSL https://api.github.com/repos/cli/cli/releases/latest'
+        " | grep '\"tag_name\"' | cut -d'\"' -f4 | sed 's/v//' > /tmp/_gh_ver.txt"
+        " && GH_VER=$(cat /tmp/_gh_ver.txt)"
+        " && mkdir -p ~/.local/bin"
+        ' && curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VER}/gh_${GH_VER}_linux_amd64.tar.gz"'
+        " -o /tmp/gh.tar.gz"
+        " && tar -xzf /tmp/gh.tar.gz -C /tmp"
+        " && mv /tmp/gh_${GH_VER}_linux_amd64/bin/gh ~/.local/bin/gh"
+        " && chmod +x ~/.local/bin/gh"
+        " && rm -rf /tmp/gh.tar.gz /tmp/gh_${GH_VER}_linux_amd64 /tmp/_gh_ver.txt",
+        timeout=120,
+    )
+    if result["success"] and os.path.isfile(os.path.expanduser("~/.local/bin/gh")):
+        # Ensure ~/.local/bin is on PATH for this session
+        run('export PATH="$HOME/.local/bin:$PATH"')
+        return {"success": True, "message": "GitHub CLI installed to ~/.local/bin (no sudo needed)"}
+
+    # --- Fallback: package manager (needs sudo via terminal) ---
+    return _install_via_terminal(
+        "GitHub CLI (gh)",
+        _gh_pkg_cmd(),
+        "gh",
+    )
+
+
+def _gh_pkg_cmd():
+    """Return the package-manager command to install gh."""
     info = get_os_info()
     mgr = info.get("pkg_manager")
-
     s = _sudo()
     if mgr == "apt":
-        # Official gh repo for Debian/Ubuntu
-        cmds = (
+        return (
             f"type -p curl >/dev/null || {s}apt install curl -y && "
             "curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | "
             f"{s}dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && "
             f"{s}chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg && "
-            'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] '
+            'echo "deb [arch=$(dpkg --print-architecture) '
+            'signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] '
             'https://cli.github.com/packages stable main" | '
             f"{s}tee /etc/apt/sources.list.d/github-cli.list > /dev/null && "
             f"{s}apt update && {s}apt install gh -y"
         )
-        result = run(cmds, timeout=600)
-    elif mgr == "dnf":
-        result = run(f"{s}dnf install -y gh", timeout=300)
-    elif mgr == "pacman":
-        result = run(f"{s}pacman -S --noconfirm github-cli", timeout=300)
-    else:
-        return {"success": False, "message": f"Cannot auto-install gh: package manager '{mgr}' is not yet supported.", "error_log": f"Detected pkg manager: {mgr}"}
-
-    if result["success"]:
-        return {"success": True, "message": "GitHub CLI installed successfully"}
-    return {"success": False, "message": "Failed to install GitHub CLI.", "error_log": result["stderr"] or result["stdout"]}
+    if mgr == "dnf":
+        return f"{s}dnf install -y gh"
+    if mgr == "pacman":
+        return f"{s}pacman -S --noconfirm github-cli"
+    return ""
 
 
 def check_ai_tool(tool):
@@ -267,30 +354,21 @@ def _install_claude_code():
 
 
 def _install_vscode():
-    info = get_os_info()
-    mgr = info.get("pkg_manager")
-
-    s = _sudo()
-    if mgr == "apt":
-        cmds = (
-            "curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/ms.gpg && "
-            f"{s}install -o root -g root -m 644 /tmp/ms.gpg /etc/apt/trusted.gpg.d/ && "
-            'echo "deb [arch=amd64] https://packages.microsoft.com/repos/code stable main" | '
-            f"{s}tee /etc/apt/sources.list.d/vscode.list && "
-            f"{s}apt update && {s}apt install -y code"
-        )
-        result = run(cmds, timeout=300)
-    elif mgr == "dnf":
-        result = run(f"{s}dnf install -y code", timeout=120)
-    elif mgr == "pacman":
-        result = run(f"{s}pacman -S --noconfirm code", timeout=120)
-    else:
-        return {"success": False, "message": "Please install VS Code manually from https://code.visualstudio.com"}
-
+    """Install VS Code using the portable tarball — no sudo required."""
+    result = run(
+        'curl -fsSL "https://code.visualstudio.com/sha/download?build=stable&os=linux-x64"'
+        " -o /tmp/vscode.tar.gz"
+        " && mkdir -p ~/.local/share/vscode"
+        " && tar -xzf /tmp/vscode.tar.gz -C ~/.local/share/vscode --strip-components=1"
+        " && mkdir -p ~/.local/bin"
+        " && ln -sf ~/.local/share/vscode/bin/code ~/.local/bin/code"
+        " && rm -f /tmp/vscode.tar.gz",
+        timeout=300,
+    )
     if result["success"]:
-        vscode_cmd = _find_vscode_cmd() or "code"
-        run(f'{vscode_cmd} --install-extension continue.continue', timeout=60)
-        return {"success": True, "message": "VS Code + Continue extension installed"}
+        vscode_cmd = _find_vscode_cmd() or os.path.expanduser("~/.local/bin/code")
+        run(f'"{vscode_cmd}" --install-extension continue.continue', timeout=60)
+        return {"success": True, "message": "VS Code + Continue extension installed (no sudo needed)"}
     return {"success": False, "message": "Failed to install VS Code.", "error_log": result["stderr"] or result["stdout"]}
 
 
@@ -308,36 +386,30 @@ def _install_copilot():
 
 
 def _install_vscode_only():
-    """Install VS Code without extensions."""
-    info = get_os_info()
-    mgr = info.get("pkg_manager")
-
-    s = _sudo()
-    if mgr == "apt":
-        cmds = (
-            "curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/ms.gpg && "
-            f"{s}install -o root -g root -m 644 /tmp/ms.gpg /etc/apt/trusted.gpg.d/ && "
-            'echo "deb [arch=amd64] https://packages.microsoft.com/repos/code stable main" | '
-            f"{s}tee /etc/apt/sources.list.d/vscode.list && "
-            f"{s}apt update && {s}apt install -y code"
-        )
-        result = run(cmds, timeout=300)
-    elif mgr == "dnf":
-        result = run(f"{s}dnf install -y code", timeout=120)
-    elif mgr == "pacman":
-        result = run(f"{s}pacman -S --noconfirm code", timeout=120)
-    else:
-        return {"success": False, "message": "Please install VS Code manually from https://code.visualstudio.com"}
-
-    return {"success": result["success"], "message": "VS Code installed" if result["success"] else "Failed to install VS Code.",
-            "error_log": "" if result["success"] else (result["stderr"] or result["stdout"])}
+    """Install VS Code without extensions using the portable tarball (no sudo)."""
+    result = run(
+        'curl -fsSL "https://code.visualstudio.com/sha/download?build=stable&os=linux-x64"'
+        " -o /tmp/vscode.tar.gz"
+        " && mkdir -p ~/.local/share/vscode"
+        " && tar -xzf /tmp/vscode.tar.gz -C ~/.local/share/vscode --strip-components=1"
+        " && mkdir -p ~/.local/bin"
+        " && ln -sf ~/.local/share/vscode/bin/code ~/.local/bin/code"
+        " && rm -f /tmp/vscode.tar.gz",
+        timeout=300,
+    )
+    return {
+        "success": result["success"],
+        "message": "VS Code installed" if result["success"] else "Failed to install VS Code.",
+        "error_log": "" if result["success"] else (result["stderr"] or result["stdout"]),
+    }
 
 
 def _install_aider():
     if not is_installed("pip3") and not is_installed("pip"):
         _pkg_install({"apt": "python3-pip", "dnf": "python3-pip", "pacman": "python-pip"})
     pip = "pip3" if is_installed("pip3") else "pip"
-    result = run(f"{pip} install aider-chat", timeout=120)
+    # --user installs to ~/.local — no sudo needed
+    result = run(f"{pip} install --user aider-chat", timeout=120)
     if result["success"]:
         return {"success": True, "message": "Aider installed successfully"}
     return {"success": False, "message": "Failed to install Aider via pip.", "error_log": result["stderr"] or result["stdout"]}

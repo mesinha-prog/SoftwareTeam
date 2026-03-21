@@ -190,16 +190,10 @@ def api_install_start(body):
     else:
         return {"success": False, "message": f"Unknown kind: {kind}"}
 
-    # On Linux, check if sudo is needed and validate the password if provided
-    info = get_os_info()
-    if info.get("os") == "linux":
-        from setup.wizard.installers.linux import _sudo
-        needs_sudo = _sudo() == "sudo "
-        if needs_sudo and not sudo_password:
-            return {"success": False, "message": "sudo password is required to install packages on this system."}
-        if needs_sudo and sudo_password:
-            if not _sudo_authorize(sudo_password):
-                return {"success": False, "message": "Incorrect sudo password. Please try again."}
+    # sudo password is no longer collected via the UI — installs use user-level
+    # methods (standalone binaries, --user pip, portable tarballs) or open a
+    # terminal for the rare case that a package manager is needed.
+    _ = sudo_password  # retained in signature for backward-compat; unused
 
     job_id = str(uuid.uuid4())[:8]
     job = {"lines": [], "done": False, "success": False, "message": "", "error_log": ""}
