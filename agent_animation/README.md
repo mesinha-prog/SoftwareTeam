@@ -65,10 +65,11 @@ python -m agent_animation.agent_window --demo
 
 ### 3. Run alongside your workflow
 
-**Step 1 — Start the window** (keep it running in background):
+**Step 1 — Start the window:**
 ```bash
-bash scripts/start-animation.sh &
+bash scripts/start-animation.sh
 ```
+(The script backgrounds the window automatically. Run without `&` so you see errors if the window fails to start — check `/tmp/agent-animation.log` on failure.)
 
 **Step 2 — Update state from your workflow scripts:**
 ```bash

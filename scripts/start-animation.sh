@@ -70,3 +70,21 @@ python -c "from agent_animation.state import write; write('it', 'idle', 'Ready..
 # ---------------------------------------------------------------------------
 nohup python -m agent_animation.agent_window "$@" \
   </dev/null >>/tmp/agent-animation.log 2>&1 &
+
+# ---------------------------------------------------------------------------
+# 5. Verify the window actually started (give it up to 6 s to appear)
+# ---------------------------------------------------------------------------
+_ok=0
+for _i in 1 2 3 4 5 6; do
+  sleep 1
+  if pgrep -f "agent_animation.agent_window" >/dev/null 2>&1; then
+    _ok=1; break
+  fi
+done
+
+if [ $_ok -eq 0 ]; then
+  echo "[agent_animation] ERROR: window did not start. Last log lines:" >&2
+  tail -20 /tmp/agent-animation.log >&2
+  exit 1
+fi
+echo "[agent_animation] Animation window running (PID: $(pgrep -f agent_animation.agent_window))"

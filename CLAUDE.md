@@ -24,9 +24,11 @@ CRITICAL: For ANY user task, follow these 9 steps IN ORDER. Do NOT skip steps.
 
 **ANIMATION — MANDATORY: Execute this command RIGHT NOW before reading any further:**
 ```bash
-bash scripts/start-animation.sh &
+bash scripts/start-animation.sh
 ```
-(Safe to run multiple times — duplicate instances are blocked automatically.)
+(No `&` — the script backgrounds the window itself. Run it in the foreground so you can see if it succeeded.)
+After running, check the exit code. If it fails (non-zero exit or the process is not running), read `/tmp/agent-animation.log` to diagnose the error, fix the issue (e.g. install missing dependencies), and run it again. Do NOT skip or ignore animation failures — keep retrying until the window is confirmed running (`pgrep -f agent_animation.agent_window`).
+
 The floating pixel animation window will appear showing the active agent. Update it at the **start of every step** and **before every handover** using:
 ```bash
 bash scripts/set-agent-state.sh {agent} {state} "{message}"
@@ -157,9 +159,10 @@ If you skip this step, the next agent will branch from an outdated task branch a
 
 **ANIMATION — Run both commands now via terminal tool** (do NOT write as text — actually execute them):
 ```bash
-bash scripts/start-animation.sh &
+bash scripts/start-animation.sh
 bash scripts/set-agent-state.sh it thinking "Verifying tools..."
 ```
+If `start-animation.sh` fails, read `/tmp/agent-animation.log`, fix the issue, and retry until `pgrep -f agent_animation.agent_window` returns a PID.
 
 Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 1: Verify Tools](./ai-assistants/agents/it-agent.md#step-1-verify-tools) in that file.
 
