@@ -222,10 +222,46 @@ def _install_copilot():
     return {"success": True, "message": "VS Code + GitHub Copilot extension installed"}
 
 
+def install_python():
+    """Install Python 3 on Windows via winget."""
+    if is_installed("python") or is_installed("py"):
+        return {"success": True, "message": "Python is already installed", "skipped": True}
+
+    if is_installed("winget"):
+        result = run(
+            "winget install Python.Python.3.12 --accept-package-agreements --accept-source-agreements",
+            timeout=300,
+        )
+        if result["success"]:
+            return {"success": True, "message": "Python 3 installed via winget"}
+        return {
+            "success": False,
+            "message": "Failed to install Python via winget.",
+            "error_log": result["stderr"] or result["stdout"],
+        }
+
+    return {
+        "success": False,
+        "message": "winget is required to install Python automatically. Please install Python from https://python.org",
+        "error_log": "winget not found in PATH",
+    }
+
+
 def _install_aider():
     if not is_installed("pip") and not is_installed("pip3"):
-        return {"success": False, "message": "Python/pip is required for Aider. Trying to install via winget...",
-                "error_log": "pip not found in PATH"}
+        py_result = install_python()
+        if not py_result.get("success"):
+            return {
+                "success": False,
+                "message": "Python/pip is required for Aider and could not be installed automatically.",
+                "error_log": py_result.get("error_log", "pip not found in PATH"),
+            }
+        if not is_installed("pip") and not is_installed("pip3"):
+            return {
+                "success": False,
+                "message": "Python was installed but pip is not yet in PATH. Please restart and try again.",
+                "error_log": "pip not found after Python installation",
+            }
     pip = "pip3" if is_installed("pip3") else "pip"
     result = run(f"{pip} install aider-chat", timeout=120)
     if result["success"]:

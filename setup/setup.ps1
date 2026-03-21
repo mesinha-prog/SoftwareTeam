@@ -46,6 +46,78 @@ function Find-PythonInPaths {
     return $null
 }
 
+# --- Check/Install winget ---
+function Ensure-Winget {
+    $winget = Get-Command winget -ErrorAction SilentlyContinue
+    if ($winget) {
+        try {
+            $ver = & winget --version 2>&1
+            if ("$ver" -match "v[\d.]+") {
+                Write-Ok "winget is available: $ver"
+                return
+            }
+        } catch { }
+    }
+
+    Write-Warn "winget not found. Attempting to install App Installer (winget)..."
+
+    # winget requires Windows 10 1809+ (build 17763)
+    $version = [System.Environment]::OSVersion.Version
+    if ($version.Build -lt 17763) {
+        Write-Warn "winget requires Windows 10 build 17763 or later. Skipping winget installation."
+        return
+    }
+
+    try {
+        # Install VCLibs prerequisite required by winget
+        Write-Info "Installing VCLibs prerequisite..."
+        $vclibsUrl  = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
+        $vclibsPath = "$env:TEMP\VCLibs.appx"
+        $ProgressPreference = 'SilentlyContinue'
+        Invoke-WebRequest -Uri $vclibsUrl -OutFile $vclibsPath -UseBasicParsing -ErrorAction Stop
+        $ProgressPreference = 'Continue'
+        Add-AppxPackage -Path $vclibsPath -ErrorAction SilentlyContinue
+        Remove-Item $vclibsPath -ErrorAction SilentlyContinue
+
+        # Fetch latest winget release from GitHub
+        Write-Info "Fetching latest winget release info..."
+        $headers = @{ "User-Agent" = "PowerShell" }
+        $release = Invoke-RestMethod -Uri "https://api.github.com/repos/microsoft/winget-cli/releases/latest" `
+            -Headers $headers -UseBasicParsing -ErrorAction Stop
+        $asset = $release.assets |
+            Where-Object { $_.name -match "Microsoft\.DesktopAppInstaller.*\.msixbundle$" } |
+            Select-Object -First 1
+        if (-not $asset) {
+            Write-Warn "Could not find winget msixbundle in the latest release. Skipping."
+            return
+        }
+
+        $msixPath = "$env:TEMP\AppInstaller.msixbundle"
+        Write-Info "Downloading winget ($($asset.name))..."
+        $ProgressPreference = 'SilentlyContinue'
+        Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $msixPath -UseBasicParsing -ErrorAction Stop
+        $ProgressPreference = 'Continue'
+
+        Write-Info "Installing winget..."
+        Add-AppxPackage -Path $msixPath -ErrorAction Stop
+        Remove-Item $msixPath -ErrorAction SilentlyContinue
+
+        # Refresh PATH so winget is visible immediately
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" +
+                    [System.Environment]::GetEnvironmentVariable("Path", "User")
+
+        if (Get-Command winget -ErrorAction SilentlyContinue) {
+            Write-Ok "winget installed successfully."
+        } else {
+            Write-Warn "winget installed but not yet in PATH. It will be available after a restart."
+        }
+    } catch {
+        Write-Warn "Could not install winget automatically: $_"
+        Write-Warn "Install it manually from the Microsoft Store (search 'App Installer') or from https://github.com/microsoft/winget-cli/releases"
+    }
+}
+
+
 # --- Check/Install Python 3 ---
 function Ensure-Python {
     # Use Continue to prevent errors from killing the script (especially under irm | iex)
@@ -363,6 +435,7 @@ Write-Host "==============================="
 Write-Host ""
 
 Get-WindowsInfo
+Ensure-Winget
 $python = Ensure-Python
 $paths = Download-Repo
 Launch-Wizard $python $paths.RepoDir $paths.TempDir
