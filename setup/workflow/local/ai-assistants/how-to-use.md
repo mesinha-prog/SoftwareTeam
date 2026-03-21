@@ -38,9 +38,6 @@ Pick one AI service to use:
 ### Step 3: Configure Your Provider
 
 ```bash
-# Copy the template
-cp ai-assistants/provider-setup/config.template.json ai-assistants/provider-setup/config.json
-
 # Set your API key:
 # Linux/macOS (add to ~/.bashrc or ~/.zshrc for persistence):
 export LLM_API_KEY="your-api-key-here"

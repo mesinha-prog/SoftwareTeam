@@ -182,8 +182,6 @@ git clone https://github.com/meenusinha/SoftwareTeam.git mySoftwareTeam
 cd mySoftwareTeam
 
 # 2. Set up your AI provider
-cp ai-assistants/provider-setup/config.template.json ai-assistants/provider-setup/config.json
-
 # Linux/macOS:
 export LLM_API_KEY="your-api-key"  # provider api key e.g., anthropic, gemini etc
 # Windows (PowerShell): $env:LLM_API_KEY = "your-api-key"

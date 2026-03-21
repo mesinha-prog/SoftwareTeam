@@ -2,9 +2,6 @@
 # API Keys and Secrets (CRITICAL - Never commit these!)
 # =============================================================================
 
-# LLM Provider Configuration (contains API settings)
-ai-assistants/provider-setup/config.json
-
 # Generic API key files
 *.key
 *.secret

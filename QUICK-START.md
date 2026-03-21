@@ -373,7 +373,10 @@ The automated review supports 7 LLM providers:
 
 Go to your repository → **Settings** → **Secrets and variables** → **Actions** → **Repository secrets** tab → Click **"New repository secret"**
 
-**For GitHub Copilot (Recommended - FREE):**
+**For GitHub Copilot (Recommended):**
+[For automated reviews you need Copilot Enterprise.]
+
+
 ```
 Name: LLM_PROVIDER
 Secret: copilot

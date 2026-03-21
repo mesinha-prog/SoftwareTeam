@@ -58,8 +58,6 @@ A simple guide for non-programmers to get up and running.
 
 ```bash
 # 1. Set up your AI provider
-cp ai-assistants/provider-setup/config.template.json ai-assistants/provider-setup/config.json
-
 # Linux/macOS:
 export ANTHROPIC_API_KEY="your-api-key"  # or GOOGLE_API_KEY or OPENAI_API_KEY
 # Windows (PowerShell): $env:ANTHROPIC_API_KEY = "your-api-key"

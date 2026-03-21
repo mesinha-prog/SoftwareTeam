@@ -4,12 +4,7 @@ This directory contains configuration for your LLM (Large Language Model) provid
 
 ## Quick Setup
 
-1. **Copy the template:**
-   ```bash
-   cp ai-assistants/provider-setup/config.template.json ai-assistants/provider-setup/config.json
-   ```
-
-2. **Set your API key:**
+1. **Set your API key:**
    ```bash
    # Linux/macOS (add to ~/.bashrc or ~/.zshrc for persistence):
    export LLM_API_KEY="your-api-key-here"
