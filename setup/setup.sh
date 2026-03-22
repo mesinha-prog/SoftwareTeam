@@ -182,7 +182,7 @@ ensure_python() {
 
     elif [ "$OS" = "linux" ]; then
         if command -v apt &>/dev/null; then
-            run_timed "Updating package lists" 60 sudo apt update -qq || true
+            run_timed "Updating package lists" 60 sudo apt update || true
             if run_timed "Installing Python 3 via apt" 120 sudo apt install -y python3; then
                 py_installed=true
             fi
