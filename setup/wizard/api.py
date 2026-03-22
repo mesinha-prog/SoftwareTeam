@@ -338,38 +338,70 @@ def api_github_login(body=None):
         return {"success": False, "status": "failed", "message": "Login failed or was cancelled."}
 
     # Start new login process
+    import shutil
+    import sys
     from setup.wizard.utils.shell import _get_env
     env = _get_env()
-    # Force no browser auto-open on some systems; user opens manually
-    env["BROWSER"] = ""
-    env["GH_BROWSER"] = " "
 
-    proc = subprocess.Popen(
-        ["gh", "auth", "login", "--hostname", "github.com", "--web", "--git-protocol", "https"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        stdin=subprocess.PIPE,
-        text=True,
-        env=env,
-    )
+    # Suppress gh's own browser-open: we open it ourselves below via
+    # webbrowser.open() so it works reliably on Windows, macOS, and Linux.
+    env["BROWSER"] = ""
+    env["GH_BROWSER"] = ""
+
+    # Resolve full path to gh so Popen works even when PATH refresh hasn't
+    # propagated to the subprocess search path (common on Windows).
+    gh_path = shutil.which("gh", path=env.get("PATH")) or "gh"
+
+    try:
+        proc = subprocess.Popen(
+            [gh_path, "auth", "login", "--hostname", "github.com", "--web", "--git-protocol", "https"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdin=subprocess.PIPE,
+            text=True,
+            env=env,
+        )
+    except FileNotFoundError:
+        return {"success": False, "message": "gh CLI not found. Please install it first (see Prerequisites)."}
+    except Exception as e:
+        return {"success": False, "message": f"Failed to start GitHub login: {e}"}
+
     api_github_login._process = proc
     api_github_login._output = ""
 
     def reader():
-        """Read stderr in background to capture device code."""
+        """Read stdout+stderr in background to capture device code."""
         output_lines = []
         try:
-            for line in proc.stderr:
-                output_lines.append(line)
-                api_github_login._output = "".join(output_lines)
-            proc.wait()
+            # gh may print to stdout or stderr depending on version/platform
+            import selectors
+            sel = selectors.DefaultSelector()
+            sel.register(proc.stdout, selectors.EVENT_READ)
+            sel.register(proc.stderr, selectors.EVENT_READ)
+            open_fds = 2
+            while open_fds > 0:
+                for key, _ in sel.select(timeout=1):
+                    line = key.fileobj.readline()
+                    if line:
+                        output_lines.append(line)
+                        api_github_login._output = "".join(output_lines)
+                    else:
+                        sel.unregister(key.fileobj)
+                        open_fds -= 1
+            sel.close()
         except Exception:
-            pass
+            # Fallback: read stderr only
+            try:
+                for line in proc.stderr:
+                    output_lines.append(line)
+                    api_github_login._output = "".join(output_lines)
+            except Exception:
+                pass
+        proc.wait()
         api_github_login._success = proc.returncode == 0
         if api_github_login._success:
-            # Configure git credential helper so git push uses this account's token.
             try:
-                subprocess.run(["gh", "auth", "setup-git"], capture_output=True, timeout=15)
+                subprocess.run([gh_path, "auth", "setup-git"], capture_output=True, timeout=15, env=env)
             except Exception:
                 pass
         api_github_login._done = True
@@ -377,9 +409,9 @@ def api_github_login(body=None):
     t = threading.Thread(target=reader, daemon=True)
     t.start()
 
-    # Wait briefly for gh to print the device code
+    # Wait up to 15s for gh to print the device code (Windows can be slower)
     import time
-    for _ in range(20):
+    for _ in range(30):
         time.sleep(0.5)
         output = api_github_login._output
         if "one-time code" in output.lower() or "https://github.com/login/device" in output:
@@ -387,15 +419,27 @@ def api_github_login(body=None):
 
     output = api_github_login._output
 
-    # Parse out the code and URL
-    code_match = re.search(r'([A-F0-9]{4}-[A-F0-9]{4})', output)
+    # GitHub device codes are XXXX-XXXX where X is any uppercase letter or digit.
+    # The previous pattern [A-F0-9] only matched hex — too restrictive.
+    code_match = re.search(r'([A-Z0-9]{4}-[A-Z0-9]{4})', output)
     url_match = re.search(r'(https://github\.com/login/device\S*)', output)
+    verification_url = url_match.group(1) if url_match else "https://github.com/login/device"
+
+    # Open the browser ourselves — reliable on all platforms (Windows, macOS, Linux).
+    # This is intentionally done after we've captured the code so the user sees
+    # the code in the wizard before (or as) the browser opens.
+    if code_match:
+        try:
+            import webbrowser
+            webbrowser.open(verification_url)
+        except Exception:
+            pass  # Non-fatal — the clickable link in the UI is the fallback
 
     return {
         "success": True,
         "status": "started",
         "device_code": code_match.group(1) if code_match else "",
-        "verification_url": url_match.group(1) if url_match else "https://github.com/login/device",
+        "verification_url": verification_url,
         "message": "Enter the code at the URL below to sign in.",
         "raw_output": output,
     }
