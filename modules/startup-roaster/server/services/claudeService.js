@@ -39,12 +39,14 @@ export async function getRoast(pitch) {
     messages: [{ role: 'user', content: `Startup idea: ${pitch}` }],
   });
 
-  const text = message.content[0].text.trim();
+  let text = message.content[0].text.trim();
+  // Strip markdown code fences if present (```json ... ``` or ``` ... ```)
+  text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
   let parsed;
   try {
     parsed = JSON.parse(text);
   } catch {
-    throw new Error('Claude returned non-JSON response');
+    throw new Error(`Claude returned non-JSON response: ${text.slice(0, 200)}`);
   }
 
   const { score, scoreLabel, feedback, suggestions } = parsed;
