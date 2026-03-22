@@ -237,16 +237,18 @@ function Ensure-Python {
     }
 
     # --- Method 1: winget ---
+    # Run winget directly (no output capture) so progress streams to the console in real time.
+    # Capturing via $var = & winget ... causes winget to detect a non-TTY pipe and buffer
+    # all output until completion — making it appear frozen for minutes.
     $winget = Get-Command winget -ErrorAction SilentlyContinue
     if ($winget) {
-        Write-Info "Installing Python 3 via winget..."
-        $wingetOut = & winget install Python.Python.3.12 --source winget --accept-package-agreements --accept-source-agreements 2>&1
+        Write-Info "Installing Python 3 via winget (output will appear below)..."
+        & winget install Python.Python.3.12 --source winget --accept-package-agreements --accept-source-agreements
         if ($LASTEXITCODE -eq 0) {
             Write-Ok "Python 3 installed via winget."
             $pyInstalled = $true
         } else {
-            Write-Warn "winget failed (exit code $LASTEXITCODE). Output:"
-            $wingetOut | Select-Object -Last 10 | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray }
+            Write-Warn "winget failed (exit code $LASTEXITCODE). Trying direct installer..."
         }
     }
 
@@ -265,8 +267,9 @@ function Ensure-Python {
 
         if (Test-Path $installerPath) {
             Write-Info "Running Python installer — attempt 1 (user-level, no admin needed)..."
+            # /passive shows a progress window without requiring user clicks (vs /quiet which is fully silent)
             $proc1 = Start-Process -FilePath $installerPath `
-                -ArgumentList "/quiet InstallAllUsers=0 PrependPath=1 /log `"$pyInstallLog`"" `
+                -ArgumentList "/passive InstallAllUsers=0 PrependPath=1 /log `"$pyInstallLog`"" `
                 -PassThru
             if (Show-InstallerProgress $proc1 120 "Installing") {
                 $pyInstalled = $true
@@ -286,7 +289,7 @@ function Ensure-Python {
                 Write-Info "Retrying with elevated permissions — a UAC prompt may appear..."
                 try {
                     $proc2 = Start-Process -FilePath $installerPath `
-                        -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1 /log `"$pyInstallLog`"" `
+                        -ArgumentList "/passive InstallAllUsers=1 PrependPath=1 /log `"$pyInstallLog`"" `
                         -Verb RunAs -PassThru -ErrorAction Stop
                     if (Show-InstallerProgress $proc2 120 "Installing (elevated)") {
                         $pyInstalled = $true
