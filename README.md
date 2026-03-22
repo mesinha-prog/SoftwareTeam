@@ -161,6 +161,7 @@ The setup wizard can install everything automatically, but you can install these
 ```bash
 brew install python3
 ```
+`brew install python3` always installs the latest Python 3 (currently 3.12), so it's always 3.6+.
 Or download from [python.org](https://www.python.org/downloads/) and run the installer.
 
 **Ubuntu / Linux / WSL**
