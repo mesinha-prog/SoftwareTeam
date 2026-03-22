@@ -105,62 +105,96 @@ def get_suggested_paths():
 def browse_folder():
     """Open a native OS folder picker dialog and return the selected path.
 
-    Tries tkinter first (cross-platform), then falls back to OS-specific tools.
-    Returns dict with 'path' (selected path or empty string if cancelled).
+    Returns dict with 'success', 'path' (empty string if cancelled), and
+    optional 'message' on failure.
     """
-    # Try tkinter (standard library, works on all platforms)
+    import subprocess
+    import shutil as _shutil
+    system = platform.system()
+
+    # --- Windows: PowerShell FolderBrowserDialog with a topmost owner form ---
+    # Tried first because tkinter dialogs on Windows often appear behind the
+    # browser window even with -topmost. A hidden TopMost Form as owner forces
+    # the dialog to the front reliably.
+    if system == "Windows":
+        ps_script = (
+            "Add-Type -AssemblyName System.Windows.Forms; "
+            "$owner = [System.Windows.Forms.Form]::new(); "
+            "$owner.TopMost = $true; "
+            "$f = [System.Windows.Forms.FolderBrowserDialog]::new(); "
+            "$f.Description = 'Choose project location'; "
+            "$f.SelectedPath = [System.Environment]::GetFolderPath('Desktop'); "
+            "if ($f.ShowDialog($owner) -eq [System.Windows.Forms.DialogResult]::OK) "
+            "{ Write-Output $f.SelectedPath }; "
+            "$owner.Dispose()"
+        )
+        try:
+            result = subprocess.run(
+                ["powershell", "-NoProfile", "-NonInteractive", "-Command", ps_script],
+                capture_output=True, text=True, timeout=300,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return {"success": True, "path": result.stdout.strip()}
+            if result.returncode == 0:
+                return {"success": True, "path": ""}  # user cancelled
+        except Exception:
+            pass  # fall through to tkinter
+
+    # --- tkinter (Mac / Linux with display, and Windows fallback) ---
     try:
         import tkinter as tk
         from tkinter import filedialog
         root = tk.Tk()
-        root.withdraw()  # Hide the root window
-        root.attributes("-topmost", True)  # Bring dialog to front
+        root.withdraw()
+        root.wm_attributes("-topmost", 1)  # bring above other windows
+        root.update()                       # process pending events so topmost takes effect
         folder = filedialog.askdirectory(
+            parent=root,
             title="Choose project location",
             initialdir=os.path.expanduser("~"),
         )
         root.destroy()
         if folder:
             return {"success": True, "path": folder}
-        return {"success": True, "path": ""}  # User cancelled
+        return {"success": True, "path": ""}  # user cancelled
     except Exception:
         pass
 
-    # Fallback: OS-specific tools
-    import subprocess
-    system = platform.system()
-
+    # --- macOS: osascript fallback ---
     if system == "Darwin":
-        # macOS: use osascript
-        script = (
-            'osascript -e \'tell application "System Events" to '
-            "activate\" -e 'set theFolder to choose folder with prompt "
-            '"Choose project location"' "' -e 'POSIX path of theFolder'"
-        )
-        result = subprocess.run(script, shell=True, capture_output=True, text=True)
-        if result.returncode == 0 and result.stdout.strip():
-            return {"success": True, "path": result.stdout.strip().rstrip("/")}
+        try:
+            result = subprocess.run(
+                ["osascript",
+                 "-e", "set theFolder to choose folder with prompt \"Choose project location\"",
+                 "-e", "POSIX path of theFolder"],
+                capture_output=True, text=True, timeout=300,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return {"success": True, "path": result.stdout.strip().rstrip("/")}
+        except Exception:
+            pass
 
+    # --- Linux: zenity or kdialog ---
     elif system == "Linux":
-        # Linux: try zenity, then kdialog
-        for cmd in ["zenity --file-selection --directory --title='Choose project location'",
-                     "kdialog --getexistingdirectory ~"]:
-            tool = cmd.split()[0]
-            if os.path.isfile(f"/usr/bin/{tool}") or os.path.isfile(f"/usr/local/bin/{tool}"):
-                result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-                if result.returncode == 0 and result.stdout.strip():
-                    return {"success": True, "path": result.stdout.strip()}
+        for cmd, args in [
+            ("zenity", ["zenity", "--file-selection", "--directory",
+                        "--title=Choose project location"]),
+            ("kdialog", ["kdialog", "--getexistingdirectory",
+                         os.path.expanduser("~")]),
+        ]:
+            if _shutil.which(cmd):
+                try:
+                    result = subprocess.run(args, capture_output=True, text=True, timeout=300)
+                    if result.returncode == 0 and result.stdout.strip():
+                        return {"success": True, "path": result.stdout.strip()}
+                except Exception:
+                    continue
 
-    elif system == "Windows":
-        # Windows: use PowerShell folder browser
-        ps_cmd = (
-            'powershell -Command "Add-Type -AssemblyName System.Windows.Forms; '
-            "$f = New-Object System.Windows.Forms.FolderBrowserDialog; "
-            "$f.Description = 'Choose project location'; "
-            "if ($f.ShowDialog() -eq 'OK') { $f.SelectedPath }\""
-        )
-        result = subprocess.run(ps_cmd, shell=True, capture_output=True, text=True)
-        if result.returncode == 0 and result.stdout.strip():
-            return {"success": True, "path": result.stdout.strip()}
-
-    return {"success": False, "path": "", "message": "No folder picker available"}
+    return {
+        "success": False,
+        "path": "",
+        "message": (
+            "Could not open a folder picker on this system. "
+            "Please type the destination path directly into the text box."
+        ),
+    }
