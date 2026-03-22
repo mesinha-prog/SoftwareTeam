@@ -19,13 +19,13 @@
 #
 # =============================================================================
 
-set -e  # Exit on error
+set -e
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+APP_DIR="$ROOT_DIR/modules/startup-roaster"
 
 echo "=========================================="
-echo "Running tests..."
+echo "Running Startup Idea Roaster tests..."
 echo "=========================================="
 
-# TODO: IT Agent - Add test commands here based on tech stack
-echo "ERROR: Test script not configured."
-echo "IT Agent must customize this script for the project's test framework."
-exit 1
+npm test --prefix "$APP_DIR/frontend"

@@ -20,13 +20,16 @@
 #
 # =============================================================================
 
-set -e  # Exit on error
+set -e
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+APP_DIR="$ROOT_DIR/modules/startup-roaster"
 
 echo "=========================================="
-echo "Building project..."
+echo "Building Startup Idea Roaster..."
 echo "=========================================="
 
-# TODO: IT Agent - Add build commands here based on tech stack
-echo "ERROR: Build script not configured."
-echo "IT Agent must customize this script for the project's technology stack."
-exit 1
+npm install --prefix "$APP_DIR/frontend"
+npm run build --prefix "$APP_DIR/frontend"
+
+echo "Build complete. Output: $APP_DIR/frontend/dist"

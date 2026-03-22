@@ -26,10 +26,15 @@
 # =============================================================================
 
 echo "=========================================="
-echo "Cleaning build artifacts..."
+echo "Cleaning Startup Idea Roaster artifacts..."
 echo "=========================================="
 
-# TODO: IT Agent - Add clean commands here based on tech stack
-echo "ERROR: Clean script not configured."
-echo "IT Agent must customize this script for the project."
-exit 1
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+APP_DIR="$ROOT_DIR/modules/startup-roaster"
+
+rm -rf "$APP_DIR/frontend/dist"
+rm -rf "$APP_DIR/frontend/node_modules"
+rm -rf "$APP_DIR/server/node_modules"
+rm -rf "$APP_DIR/node_modules"
+
+echo "Clean complete."

@@ -20,7 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python scripts/hook-pre-tool-use.py"
+            "command": "python /Users/meenusinha/poc_genai/demo/SoftwareTeam/scripts/hook-pre-tool-use.py"
           }
         ]
       }
