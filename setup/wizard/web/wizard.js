@@ -422,15 +422,11 @@ async function forkAndClone(force = false) {
   btn.innerHTML = '<span class="spinner"></span> Forking & Cloning...';
   btn.disabled = true;
 
-  const payload = { path: state.projectPath, project_name: projectName, force: force };
-  console.log('[forkAndClone] sending:', JSON.stringify(payload));
-  const result = await api('/api/github/fork-clone', payload);
-  console.log('[forkAndClone] result:', JSON.stringify(result));
+  const result = await api('/api/github/fork-clone', { path: state.projectPath, project_name: projectName, force: force });
 
-  const dbgHtml = result._debug ? `<br><small style="font-family:monospace;color:#888">debug: ${JSON.stringify(result._debug)}</small>` : '';
   if (result.success) {
     state.projectPath = result.project_path;
-    showAlert('clone-alerts', `${result.message}${dbgHtml}<br><small style="color:var(--text-muted)">Repository context configured for PR creation.</small>`, 'success');
+    showAlert('clone-alerts', `${result.message}<br><small style="color:var(--text-muted)">Repository context configured for PR creation.</small>`, 'success');
     document.getElementById('clone-next').disabled = false;
     btn.textContent = '✓ Forked & Cloned';
   } else if (result.exists) {
@@ -438,7 +434,7 @@ async function forkAndClone(force = false) {
     btn.textContent = 'Fork & Clone';
     btn.disabled = false;
   } else {
-    showAlert('clone-alerts', result.message + dbgHtml, 'danger');
+    showAlert('clone-alerts', result.message, 'danger');
     btn.textContent = 'Fork & Clone';
     btn.disabled = false;
   }
@@ -451,15 +447,11 @@ async function copyLocal(force = false) {
   btn.innerHTML = '<span class="spinner"></span> Copying files...';
   btn.disabled = true;
 
-  const payload = { path: state.projectPath, project_name: projectName, force: force };
-  console.log('[copyLocal] sending:', JSON.stringify(payload));
-  const result = await api('/api/local/copy', payload);
-  console.log('[copyLocal] result:', JSON.stringify(result));
+  const result = await api('/api/local/copy', { path: state.projectPath, project_name: projectName, force: force });
 
-  const dbgHtml = result._debug ? `<br><small style="font-family:monospace;color:#888">debug: ${JSON.stringify(result._debug)}</small>` : '';
   if (result.success) {
     state.projectPath = result.project_path;
-    showAlert('local-alerts', result.message + dbgHtml, 'success');
+    showAlert('local-alerts', result.message, 'success');
     document.getElementById('local-next').disabled = false;
     btn.textContent = '✓ Copied';
   } else if (result.exists) {
@@ -467,7 +459,7 @@ async function copyLocal(force = false) {
     btn.textContent = 'Copy Project Files';
     btn.disabled = false;
   } else {
-    showAlert('local-alerts', result.message + dbgHtml, 'danger');
+    showAlert('local-alerts', result.message, 'danger');
     btn.textContent = 'Copy Project Files';
     btn.disabled = false;
   }
