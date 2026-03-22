@@ -218,8 +218,6 @@ def install_gh():
         timeout=120,
     )
     if result["success"] and os.path.isfile(os.path.expanduser("~/.local/bin/gh")):
-        # Ensure ~/.local/bin is on PATH for this session
-        run('export PATH="$HOME/.local/bin:$PATH"')
         return {"success": True, "message": "GitHub CLI installed to ~/.local/bin (no sudo needed)"}
 
     # --- Fallback: package manager (needs sudo via terminal) ---

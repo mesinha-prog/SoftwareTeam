@@ -181,8 +181,44 @@ def log_message(text):
 
 
 def _get_env():
-    """Get environment with PATH expanded to common install locations."""
+    """Get environment with PATH expanded to common install locations.
+
+    On Windows, re-reads PATH from the registry on every call so that tools
+    installed by winget/choco during this session are visible without
+    restarting the Python process (os.environ["PATH"] is frozen at startup).
+
+    On Mac/Linux, prepends common install directories that may be missing
+    from the inherited PATH (Homebrew, ~/.local/bin, etc.).
+    """
+    import sys
     env = os.environ.copy()
+
+    if sys.platform == "win32":
+        # Pull the live PATH from the Windows registry so recently-installed
+        # tools (winget, choco) are found even though os.environ is stale.
+        try:
+            import winreg
+            parts = []
+            for hive, subkey in [
+                (winreg.HKEY_LOCAL_MACHINE,
+                 r"SYSTEM\CurrentControlSet\Control\Session Manager\Environment"),
+                (winreg.HKEY_CURRENT_USER, r"Environment"),
+            ]:
+                try:
+                    with winreg.OpenKey(hive, subkey) as k:
+                        val, _ = winreg.QueryValueEx(k, "Path")
+                        parts.append(os.path.expandvars(val))
+                except OSError:
+                    pass
+            if parts:
+                registry_path = ";".join(parts)
+                current = env.get("PATH", "")
+                env["PATH"] = registry_path + (";" + current if current else "")
+        except Exception:
+            pass  # winreg unavailable — fall back to os.environ as-is
+        return env
+
+    # Mac / Linux — prepend common install directories
     extra_paths = [
         "/usr/local/bin",
         "/opt/homebrew/bin",
